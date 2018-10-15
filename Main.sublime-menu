@@ -1,0 +1,35 @@
+[
+    {
+        "mnemonic": "n",
+        "caption": "Preferences",
+        "id": "preferences",
+        "children": [
+            {
+                "mnemonic": "P",
+                "caption": "Package Settings",
+                "id": "package-settings",
+                "children": [
+                    {
+                        "caption": "Poem",
+                        "children": [
+                            {
+                                "caption": "Settings",
+                                "command": "edit_settings",
+                                "args": {
+                                    "base_file": "${packages}/Poem/Poem.sublime-settings"
+                                },
+                            },
+                            {
+                                "caption": "Key Bindings",
+                                "command": "edit_settings",
+                                "args": {
+                                    "base_file": "${packages}/Poem/Default ($platform).sublime-keymap"
+                                },
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

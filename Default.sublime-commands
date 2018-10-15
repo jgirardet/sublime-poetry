@@ -1,0 +1,6 @@
+[
+    {
+        "caption": "Poetry: Set python path",
+        "command": "poem_set_python_path"
+    },
+]

@@ -1,0 +1,18 @@
+{
+      // ########################
+      // Poetry specific options #
+      // ########################
+
+
+
+
+      // ##########################
+      // Poem specific options #
+      // ##########################
+
+
+      // set debug mode. default is info
+      // choices : debug > info > error
+      "poem_log": "info",
+ 
+}

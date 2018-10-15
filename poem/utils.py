@@ -2,6 +2,10 @@ import re
 import sublime
 from .consts import (
     PACKAGE_NAME,
+    SETTINGS_FILE_NAME,
+    SETTINGS_NS_PREFIX,
+    CONFIG_OPTIONS,
+    KEY_ERROR_MARKER,
 )
 
 import pathlib
@@ -52,35 +56,26 @@ def timed(fn):
     return to_time
 
 
-
-
 def get_settings(view):
     flat_settings = view.settings()
     nested_settings = flat_settings.get(PACKAGE_NAME, {})
     global_settings = sublime.load_settings(SETTINGS_FILE_NAME)
-    pyproject_settings = read_pyproject_toml(find_root_file(view, "pyproject.toml"))
     settings = {}
 
     for k in CONFIG_OPTIONS:
-        # 1. pyproject
-        value = pyproject_settings.get(k[6:].replace("_", "-"), None)
-        if value:
-            settings[k] = value
-            continue
-
-        # 2. check sublime "flat settings"
+        # 1. check sublime "flat settings"
         value = flat_settings.get(SETTINGS_NS_PREFIX + k, KEY_ERROR_MARKER)
         if value != KEY_ERROR_MARKER:
             settings[k] = value
             continue
 
-        # 3. check sublieme "nested settings" for compatibility reason
+        # 2. check sublieme "nested settings" for compatibility reason
         value = nested_settings.get(k, KEY_ERROR_MARKER)
         if value != KEY_ERROR_MARKER:
             settings[k] = value
             continue
 
-        # 4. check plugin/user settings
+        # 3 check plugin/user settings
         settings[k] = global_settings.get(k)
 
     return settings
@@ -110,7 +105,6 @@ def kill_with_pid(pid: int):
 
 
 popen = partial(subprocess.Popen, startupinfo=startup_info())
-
 
 
 def find_root_file(view, filename):
@@ -165,3 +159,12 @@ def read_pyproject_toml(pyproject: Path) -> dict:
 
     LOG.debug("config values extracted from %s : %r", pyproject, config)
     return config
+
+
+def poetry_used(view):
+    pyproject = find_root_file(view, "pyproject.toml")
+    if pyproject:
+        if "tool.poetry" in  pyproject.read_text():
+            return True
+
+    return False

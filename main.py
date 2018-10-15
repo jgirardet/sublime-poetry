@@ -8,10 +8,7 @@ import logging
 import sublime
 import os
 
-from .poem import (
-    PACKAGE_NAME,
-        # get_settings,
-)  # flake8: noqa
+from .poem import PACKAGE_NAME, get_settings, PoemSetPythonInterpreterCommand  # flake8: noqa
 
 
 LOG = logging.getLogger(PACKAGE_NAME)
@@ -23,7 +20,7 @@ if not os.environ.get("CI", None):
 def plugin_loaded():
     # load config
     current_view = sublime.active_window().active_view()
-    config = {"poem_log": "DEBUG"} #get_settings(current_view)
+    config = get_settings(current_view)
 
     # Setup  logging
     if not LOG.handlers:
@@ -43,4 +40,3 @@ def plugin_loaded():
         LOG.error("fallback to loglevel ERROR")
 
     LOG.info("Loglevel set to %s", config["poem_log"].upper())
-

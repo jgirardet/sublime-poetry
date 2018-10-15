@@ -14,5 +14,7 @@
       // set debug mode. default is info
       // choices : debug > info > error
       "poem_log": "info",
+
+      "poem_autoset_path": true
  
 }

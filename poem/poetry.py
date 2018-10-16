@@ -1,4 +1,3 @@
-import subprocess
 import re
 from .utils import Path
 

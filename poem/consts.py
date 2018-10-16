@@ -5,4 +5,3 @@ KEY_ERROR_MARKER = "__KEY_NOT_PRESENT_MARKER__"
 
 
 CONFIG_OPTIONS = {"poem_log": "info", "poem_autoset_path": True}
-

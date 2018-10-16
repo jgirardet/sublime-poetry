@@ -2,6 +2,7 @@ import sys
 from unittest import TestCase
 import tempfile
 import subprocess
+import sublime
 
 poem = sys.modules["poem.poem"]
 Path = poem.utils.Path
@@ -31,34 +32,42 @@ PROJECT = """{{
 
 
 class PoemTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        window = sublime.active_window()
+        window.run_command("new_window")
+        cls.dir = tempfile.TemporaryDirectory()
 
-        self.dir = tempfile.TemporaryDirectory()
-        self.path = Path(self.dir.name)
-        self.toml = self.path / "pyproject.toml"
-        self.env = self.path / ".env"
+        cls.window = sublime.active_window()
+        cls.window.set_project_data({"folders": [{"path": cls.dir.name}]})
 
-        self.create_env()
+        cls.path = Path(cls.dir.name)
+        cls.pyproject = cls.path / "pyproject.toml"
 
-        self.project = self.path / "bla.sublime-project"
-        self.init_project()
+        cls.create_env()
 
-    def create_env(self):
-        self.check_call([poem.compat.PYTHON, "-m", "venv", ".env"])
 
-    # def tearDown(self):
-    #     import time
-    #     time.sleep(15)
+        cls.pyproject.touch()
+        cls.pyproject.write_text(BLANK)
+
+    @classmethod
+    def tearDownClass(cls):
+        import time
+
+        cls.window.run_command("close_window")
+
+
+    @classmethod
+    def create_env(cls):
+        cls.check_call([poem.compat.PYTHON, "-m", "venv", ".venv"])
 
     def popen(self, *args, **kwargs):
         return subprocess.Popen(
             *args, cwd=str(self.path), startupinfo=poem.utils.startup_info(), **kwargs
         )
 
-    def check_call(self, *args, **kwargs):
+    @classmethod
+    def check_call(cls, *args, **kwargs):
         return subprocess.check_call(
-            *args, cwd=self.dir.name, startupinfo=poem.utils.startup_info(), **kwargs
+            *args, cwd=cls.dir.name, startupinfo=poem.utils.startup_info(), **kwargs
         )
-
-    def init_project(self):
-        self.project.write_text(PROJECT.format(self.dir.name))

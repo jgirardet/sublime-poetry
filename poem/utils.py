@@ -104,9 +104,6 @@ def kill_with_pid(pid: int):
         os.kill(pid, signal.SIGTERM)
 
 
-popen = partial(subprocess.Popen, startupinfo=startup_info())
-
-
 def find_root_file(view, filename):
     """Only search in projects and folders since pyproject.toml/precommit, ... should be nowhere else"""
     window = view.window()
@@ -164,7 +161,31 @@ def read_pyproject_toml(pyproject: Path) -> dict:
 def poetry_used(view):
     pyproject = find_root_file(view, "pyproject.toml")
     if pyproject:
-        if "tool.poetry" in  pyproject.read_text():
+        if "tool.poetry" in pyproject.read_text():
             return True
 
     return False
+
+
+def find_pyproject():
+    view = sublime.active_window().active_view()
+    return partial(find_root_file, view=view, filename="pyproject.toml")()
+
+
+def popen_out(*args, **kwargs):
+
+    return subprocess.check_output(
+        *args, startupinfo=startup_info(), cwd=str(find_pyproject().parent), **kwargs
+    )
+
+
+def popen(*args, **kwargs):
+
+    return subprocess.Popen(
+        *args, startupinfo=startup_info(), cwd=str(find_pyproject().parent), **kwargs
+    )
+
+
+# Partial zone
+# view  = sublime.active_window().active_view()
+# find_pyproject = partial(find_root_file, view = view, filename = "pyproject.toml")

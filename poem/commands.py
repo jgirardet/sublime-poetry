@@ -1,7 +1,7 @@
 import sublime_plugin
 from .utils import get_settings, poetry_used
 from collections import defaultdict
-
+from .poetry import get_venv_path
 
 class PoemSetPythonInterpreterCommand(sublime_plugin.WindowCommand):
     def is_active(self):
@@ -15,5 +15,5 @@ class PoemSetPythonInterpreterCommand(sublime_plugin.WindowCommand):
 
             project = defaultdict(dict)
             project.update(self.window.project_data())
-            project["settings"]["python_interpreter"] = "/home/jimmy/trash/black/.venv/bin/python"
+            project["settings"]["python_interpreter"] = str(get_venv_path())
             self.window.set_project_data(project)

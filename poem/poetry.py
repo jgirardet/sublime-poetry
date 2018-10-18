@@ -5,6 +5,10 @@ from .utils import popen_out
 from .compat import VENV_BIN_DIR
 import sublime
 import os
+from .consts import PACKAGE_NAME
+import logging
+
+LOG = logging.getLogger(PACKAGE_NAME)
 
 
 def poetry_cmd():
@@ -21,8 +25,9 @@ def poetry_cmd():
 
     try:
         popen_out([poetry_bin], cwd=None)
-    except FileNotFoundError:
-        return False
+    except FileNotFoundError as err:
+        LOG.error(err)
+        raise err
 
     return poetry_bin
 

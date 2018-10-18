@@ -1,4 +1,3 @@
-import re
 import sublime
 from .consts import (
     PACKAGE_NAME,
@@ -13,10 +12,7 @@ import subprocess
 import signal
 import os
 from functools import partial
-import socket
-import requests
 import logging
-import yaml
 
 LOG = logging.getLogger(PACKAGE_NAME)
 

@@ -13,6 +13,6 @@ def get_venv_path():
         .split(b":")[1]
         .strip()
     )
-    if venv:
+    if venv and venv != b"NA":
         python_interpreter = Path(venv.decode()) / VENV_BIN_DIR / "python"
         return python_interpreter

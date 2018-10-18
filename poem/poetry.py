@@ -6,9 +6,9 @@ from .compat import VENV_BIN_DIR
 import sublime
 import os
 from .consts import PACKAGE_NAME
-import logging
+# import logging
 
-LOG = logging.getLogger(PACKAGE_NAME)
+# LOG = logging.getLogger(PACKAGE_NAME)
 
 
 def poetry_cmd():
@@ -26,7 +26,7 @@ def poetry_cmd():
     try:
         popen_out([poetry_bin], cwd=None)
     except FileNotFoundError as err:
-        LOG.error(err)
+        # LOG.error(err)
         raise err
 
     return poetry_bin

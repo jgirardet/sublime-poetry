@@ -32,29 +32,29 @@ PROJECT = """{{
 
 
 class PoemTestCase(TestCase):
-    # @classmethod
-    # def setUpClass(cls):
-    #     window = sublime.active_window()
-    #     window.run_command("new_window")
-    #     cls.dir = tempfile.TemporaryDirectory()
+    @classmethod
+    def setUpClass(cls):
+        window = sublime.active_window()
+        window.run_command("new_window")
+        cls.dir = tempfile.TemporaryDirectory()
 
-    #     cls.window = sublime.active_window()
-    #     cls.window.set_project_data({"folders": [{"path": cls.dir.name}]})
+        cls.window = sublime.active_window()
+        cls.window.set_project_data({"folders": [{"path": cls.dir.name}]})
 
-    #     cls.path = Path(cls.dir.name)
-    #     cls.pyproject = cls.path / "pyproject.toml"
+        cls.path = Path(cls.dir.name)
+        cls.pyproject = cls.path / "pyproject.toml"
 
-    #     cls.create_env()
+        cls.create_env()
 
 
-    #     cls.pyproject.touch()
-    #     cls.pyproject.write_text(BLANK)
+        cls.pyproject.touch()
+        cls.pyproject.write_text(BLANK)
 
-    # @classmethod
-    # def tearDownClass(cls):
-    #     import time
+    @classmethod
+    def tearDownClass(cls):
+        import time
 
-    #     cls.window.run_command("close_window")
+        cls.window.run_command("close_window")
 
 
     @classmethod

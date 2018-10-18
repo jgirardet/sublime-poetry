@@ -168,18 +168,17 @@ def find_pyproject():
     return partial(find_root_file, view=view, filename="pyproject.toml")()
 
 
-def popen_out(*args, **kwargs):
+def popen_out(*args, cwd="", **kwargs):
+    if not cwd and cwd is not None: #cover the default but keep non possible
+        cwd = str(find_pyproject().parent)
+    return subprocess.check_output(*args, startupinfo=startup_info(), cwd=cwd, **kwargs)
 
-    return subprocess.check_output(
-        *args, startupinfo=startup_info(), cwd=str(find_pyproject().parent), **kwargs
-    )
 
+def popen(*args, cwd="", **kwargs):
+    if not cwd and cwd is not None: #cover the default but keep non possible
+        cwd = str(find_pyproject().parent)
 
-def popen(*args, **kwargs):
-
-    return subprocess.Popen(
-        *args, startupinfo=startup_info(), cwd=str(find_pyproject().parent), **kwargs
-    )
+    return subprocess.Popen(*args, startupinfo=startup_info(), cwd=cwd, **kwargs)
 
 
 # Partial zone

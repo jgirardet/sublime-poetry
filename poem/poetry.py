@@ -5,7 +5,7 @@ from .utils import popen_out
 from .compat import VENV_BIN_DIR
 import sublime
 import os
-from .consts import PACKAGE_NAME
+# from .consts import PACKAGE_NAME
 # import logging
 
 # LOG = logging.getLogger(PACKAGE_NAME)

@@ -1,6 +1,6 @@
 env:
     global:
-        - PACKAGE="Poem" # Package name
+        - PACKAGE="poem" # Package name
         - SUBLIME_TEXT_VERSION="3"
         # use UNITTESTING_TAG to specific tag of UnitTesting
         # - UNITTESTING_TAG="master"
@@ -11,7 +11,7 @@ matrix:
     include:
         - os: linux
           language: python        
-          python: 3.3
+          python: 3.4
         - os: linux
           language: python
           python: 3.6

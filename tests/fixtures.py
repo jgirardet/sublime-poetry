@@ -32,7 +32,11 @@ PROJECT = """{{
 
 
 class PoemTestCase(TestCase):
+    @classmethod
     def setUp(self):
+        window = sublime.active_window()
+        window.run_command("new_window")
+        self.dir = tempfile.TemporaryDirectory()
 
         #sublime :
         self.window = sublime.active_window()
@@ -43,8 +47,6 @@ class PoemTestCase(TestCase):
         self.dirpath = Path(self.dir.name)
         self.toml = self.dirpath / "pyproject.toml"
         self.env = self.dirpath / ".venv"
-
-        self.create_env()
 
         self.project = self.dirpath / "bla.sublime-project"
         
@@ -67,14 +69,18 @@ class PoemTestCase(TestCase):
         self.check_call([poem.compat.PYTHON, "-m", "venv", ".venv"])
     
 
+
+
+
     def popen(self, *args, **kwargs):
         return subprocess.Popen(
             *args, cwd=str(self.dirpath), startupinfo=poem.utils.startup_info(), **kwargs
         )
 
-    def check_call(self, *args, **kwargs):
+    @classmethod
+    def check_call(cls, *args, **kwargs):
         return subprocess.check_call(
-            *args, cwd=self.dir.name, startupinfo=poem.utils.startup_info(), **kwargs
+            *args, cwd=cls.dir.name, startupinfo=poem.utils.startup_info(), **kwargs
         )
 
     def init_project(self):

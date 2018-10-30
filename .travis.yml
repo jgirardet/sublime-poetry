@@ -4,7 +4,6 @@ env:
         - SUBLIME_TEXT_VERSION="3"
         # use UNITTESTING_TAG to specific tag of UnitTesting
         # - UNITTESTING_TAG="master"
-        - VIRTUAL_ENV=
 
 # mutliple os matrix
 # https://docs.travis-ci.com/user/multi-os/#Python-example-(unsupported-languages)

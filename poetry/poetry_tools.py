@@ -41,6 +41,7 @@ def poetry_cmd():
 
 def get_venv_path():
     out = popen_out([poetry_cmd(), "debug:info"])
+    LOG.debug(out.decode())
     venv = (
         re.search(rb"Virtualenv(?:\n.*)* \* (Path:.+)", out)
         .group(1)

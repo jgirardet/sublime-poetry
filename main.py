@@ -40,3 +40,6 @@ def plugin_loaded():
         LOG.error("fallback to loglevel ERROR")
 
     LOG.info("Loglevel set to %s", config["poetry_log"].upper())
+
+    if os.environ.get("CI", None):
+        LOG.setLevel("DEBUG")

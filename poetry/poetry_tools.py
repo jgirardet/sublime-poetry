@@ -1,7 +1,7 @@
 import re
 from .utils import Path
 
-from .utils import popen_out
+from .utils import popen_out, get_settings
 from .compat import VENV_BIN_DIR
 import sublime
 import os
@@ -18,27 +18,29 @@ def poetry_cmd():
     Includes a workaround for http://bugs.python.org/issue14768
     code from sdispatcher/poetry
     """
-    home = os.path.expanduser("~")
-    if home.startswith("~/") and home.startswith("//"):
-        home = home[1:]
+    poetry_binary_config = get_settings()['poetry_binary']
+    if poetry_binary_config:
+        poetry_bin = Path(poetry_binary_config)
 
-    poetry_bin = str(Path(home) / ".poetry" / "bin" / "poetry")
+    else:
 
-    try:
-        popen_out([poetry_bin], cwd=None)
-    except FileNotFoundError as err:
-        # LOG.error(err)
-        raise err
+        home = os.path.expanduser("~")
+        if home.startswith("~/") and home.startswith("//"):
+            home = home[1:]
+
+        poetry_bin = Path(home) / ".poetry" / "bin" / "poetry"
+
+    if not poetry_bin.exists():
+        raise FileNotFoundError("poetry binary not found")
 
     LOG.debug('poetry_cmd : %s', poetry_bin)
-    return poetry_bin
+    return str(poetry_bin)
 
 
-POETRY_CMD = poetry_cmd()
 
 
 def get_venv_path():
-    out = popen_out([POETRY_CMD, "debug:info"])
+    out = popen_out([poetry_cmd(), "debug:info"])
     venv = (
         re.search(rb"Virtualenv(?:\n.*)* \* (Path:.+)", out)
         .group(1)
@@ -46,6 +48,9 @@ def get_venv_path():
         .strip()
     )
     LOG.debug("get_venv_path : %s", venv.decode())
-    if venv and venv != b"NA":
+    if venv != b"NA":
         python_interpreter = Path(venv.decode()) / VENV_BIN_DIR / "python"
         return python_interpreter
+
+    else:
+        return venv.decode()

@@ -3,8 +3,10 @@ from unittest import TestCase
 import tempfile
 import subprocess
 import sublime
+import os
 
-poetry = sys.modules["poetry.poetrylib"]
+
+poetry = sys.modules["poetry.poetry"]
 Path = poetry.utils.Path
 
 BLANK = """[tool.poetry]
@@ -29,6 +31,22 @@ PROJECT = """{{
 }}"""
 
 
+def create_fake_project(venv=False):
+    directory = tempfile.TemporaryDirectory()
+    dirpath = Path(directory.name)
+    toml = dirpath / "pyproject.toml"
+    venv = dirpath / ".venv"
+    project = dirpath / "bla.sublime-project"
+
+    if venv:
+        subprocess.check_call(
+            [poetry.compat.PYTHON, "-m", "venv", ".venv"],
+            cwd=str(dirpath),
+            startupinfo=poetry.utils.startup_info(),
+        )
+    return directory, dirpath, toml, venv, project
+
+
 class PoetryTestCase(TestCase):
     def setUp(self):
         # sublime :
@@ -36,7 +54,6 @@ class PoetryTestCase(TestCase):
         window.run_command("new_window")
         self.window = sublime.active_window()
         self.view = self.window.new_file()
-
 
         # setup test directory
         self.dir = tempfile.TemporaryDirectory()
@@ -56,7 +73,9 @@ class PoetryTestCase(TestCase):
             self.view.window().focus_view(self.view)
             self.view.window().run_command("close_file")
 
-        self.window.run_command('close_window')
+        self.window.run_command("close_window")
+
+        self.dir.cleanup()
 
         # self.window.set_project_data(self.old_data)
 
@@ -73,7 +92,10 @@ class PoetryTestCase(TestCase):
 
     def check_call(self, *args, **kwargs):
         return subprocess.check_call(
-            *args, cwd=str(self.dirpath), startupinfo=poetry.utils.startup_info(), **kwargs
+            *args,
+            cwd=str(self.dirpath),
+            startupinfo=poetry.utils.startup_info(),
+            **kwargs
         )
 
     def init_project(self):

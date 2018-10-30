@@ -17,6 +17,9 @@ import logging
 LOG = logging.getLogger(PACKAGE_NAME)
 
 
+def current_view():
+    return sublime.active_window().active_view()
+
 class Path(type(pathlib.Path())):
     def write_text(
         self, content, mode="w", buffering=-1, encoding=None, errors=None, newline=None
@@ -52,7 +55,7 @@ def timed(fn):
     return to_time
 
 
-def get_settings(view):
+def get_settings(view=current_view()):
     flat_settings = view.settings()
     nested_settings = flat_settings.get(PACKAGE_NAME, {})
     global_settings = sublime.load_settings(SETTINGS_FILE_NAME)

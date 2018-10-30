@@ -7,7 +7,8 @@ install:
     - "SET PYTHON=C:\\Python36"
     - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
     # - pip install black
-    - pip install poetry
+    - appveyor DownloadFile "https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py"
+    - python get-poetry.py -y
     - ps: appveyor DownloadFile "https://raw.githubusercontent.com/SublimeText/UnitTesting/master/sbin/appveyor.ps1"
     - ps: .\appveyor.ps1 "bootstrap" -verbose
     # install Package Control

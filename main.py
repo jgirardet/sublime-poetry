@@ -8,7 +8,7 @@ import logging
 import sublime
 import os
 
-from .poetrylib import PACKAGE_NAME, get_settings, PoetrySetPythonInterpreterCommand  # flake8: noqa
+from .poetry import PACKAGE_NAME, get_settings, PoetrySetPythonInterpreterCommand  # flake8: noqa
 
 
 LOG = logging.getLogger(PACKAGE_NAME)

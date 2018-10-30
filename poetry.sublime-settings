@@ -15,8 +15,9 @@
       // choices : debug > info > error
       "poetry_log": "info",
 
+      // autoset python_interpreter at project openning
       "poetry_autoset_path": true,
 
-      "poetry_poetry_path": "guess"
+      "poetry_binary": null
  
 }

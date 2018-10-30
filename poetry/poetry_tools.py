@@ -40,8 +40,11 @@ def poetry_cmd():
 
 
 def get_venv_path():
+    import subprocess
     out = popen_out([poetry_cmd(), "debug:info"])
-    LOG.debug(out.decode())
+    rien = subprocess.check_output([poetry_cmd(), "debug:info"])
+    import os
+    LOG.debug(out.decode(), rien.decode(), os.getcwd())
     venv = (
         re.search(rb"Virtualenv(?:\n.*)* \* (Path:.+)", out)
         .group(1)
@@ -53,5 +56,3 @@ def get_venv_path():
         python_interpreter = Path(venv.decode()) / VENV_BIN_DIR / "python"
         return python_interpreter
 
-    else:
-        return venv.decode()

@@ -59,7 +59,7 @@ class PoetryTestCase(TestCase):
         self.dir = tempfile.TemporaryDirectory()
         self.dirpath = Path(self.dir.name)
         self.toml = self.dirpath / "pyproject.toml"
-        self.env = self.dirpath / ".venv"
+        self.venv = self.dirpath / ".venv"
 
         self.project = self.dirpath / "bla.sublime-project"
 

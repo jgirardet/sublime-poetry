@@ -17,16 +17,14 @@ class TestPoetry(PoetryTestCase):
         self.window.run_command("poetry_set_python_interpreter")
         project_data = self.window.project_data()
 
-        if "CI" in os.environ: #because poetry ignore .venv ifVIRTUAL_ENV set
-            base = Path(os.environ['VIRTUAL_ENV'])
+        if "CI" in os.environ:  # because poetry ignore .venv ifVIRTUAL_ENV set
+            base = Path(os.environ["VIRTUAL_ENV"])
         else:
-            base = self.dirpath
+            base = self.venv
         self.assertEqual(
             project_data,
             {
-                "settings": {
-                    "python_interpreter": str(base / ".venv" / "bin" / "python")
-                },
+                "settings": {"python_interpreter": str(base / "bin" / "python")},
                 "folders": [{"path": self.dir.name}],
             },
         )

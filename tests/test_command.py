@@ -2,6 +2,8 @@ from unittest import TestCase
 
 from fixtures import poetry, PoetryTestCase
 import sublime
+import os
+from pathlib import Path
 
 
 class TestPoetry(PoetryTestCase):
@@ -14,10 +16,17 @@ class TestPoetry(PoetryTestCase):
         self.create_venv()
         self.window.run_command("poetry_set_python_interpreter")
         project_data = self.window.project_data()
+
+        if "CI" in os.environ: #because poetry ignore .venv ifVIRTUAL_ENV set
+            base = Path(os.environ['VIRTUAL_ENV'])
+        else:
+            base = self.dirpath
         self.assertEqual(
             project_data,
             {
-                "settings": {"python_interpreter": str(self.dirpath / ".venv" /  "bin" / "python")},
+                "settings": {
+                    "python_interpreter": str(base / ".venv" / "bin" / "python")
+                },
                 "folders": [{"path": self.dir.name}],
             },
         )

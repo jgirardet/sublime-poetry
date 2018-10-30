@@ -168,7 +168,9 @@ def poetry_used(view):
 
 def find_pyproject():
     view = sublime.active_window().active_view()
-    return partial(find_root_file, view=view, filename="pyproject.toml")()
+    pp = partial(find_root_file, view=view, filename="pyproject.toml")()
+    LOG.debug('find_pyproject :%s', pp)
+    return pp
 
 
 def popen_out(*args, cwd="", **kwargs):

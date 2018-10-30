@@ -6,6 +6,7 @@ from .compat import VENV_BIN_DIR
 import sublime
 import os
 from .consts import PACKAGE_NAME
+
 # from .consts import PACKAGE_NAME
 import logging
 
@@ -18,7 +19,7 @@ def poetry_cmd():
     Includes a workaround for http://bugs.python.org/issue14768
     code from sdispatcher/poetry
     """
-    poetry_binary_config = get_settings()['poetry_binary']
+    poetry_binary_config = get_settings()["poetry_binary"]
     if poetry_binary_config:
         poetry_bin = Path(poetry_binary_config)
 
@@ -33,18 +34,18 @@ def poetry_cmd():
     if not poetry_bin.exists():
         raise FileNotFoundError("poetry binary not found")
 
-    LOG.debug('poetry_cmd : %s', poetry_bin)
+    LOG.debug("poetry_cmd : %s", poetry_bin)
     return str(poetry_bin)
-
-
 
 
 def get_venv_path():
     import subprocess
+
     out = popen_out([poetry_cmd(), "debug:info"])
-    rien = subprocess.check_output([poetry_cmd(), "debug:info"])
+    # rien = subprocess.check_output([poetry_cmd(), "debug:info"])
     import os
-    LOG.debug(out.decode(), rien.decode(), os.getcwd())
+
+    LOG.debug(out.decode())
     venv = (
         re.search(rb"Virtualenv(?:\n.*)* \* (Path:.+)", out)
         .group(1)
@@ -55,4 +56,3 @@ def get_venv_path():
     if venv != b"NA":
         python_interpreter = Path(venv.decode()) / VENV_BIN_DIR / "python"
         return python_interpreter
-

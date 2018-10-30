@@ -46,9 +46,7 @@ script:
 
 after_success:
     # remove the following if `coveralls` is not needed
-    - pip3 install python-coveralls;
     - pip3 install codecov;
-    - coveralls
     - codecov
 
 notifications:

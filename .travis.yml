@@ -41,6 +41,11 @@ install:
 
 script:
     # run tests with test coverage report
+    - echo $VIRTUAL_ENV
+    - poetry debug:info
+    - export VIRTUAL_ENV=
+    - echo $VIRTUAL_ENV
+    - poetry debug:info
     - sh travis.sh run_tests --coverage
     # testing syntax_test files
     # - sh travis.sh run_syntax_tests

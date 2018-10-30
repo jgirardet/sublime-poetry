@@ -20,6 +20,7 @@ LOG = logging.getLogger(PACKAGE_NAME)
 def current_view():
     return sublime.active_window().active_view()
 
+
 class Path(type(pathlib.Path())):
     def write_text(
         self, content, mode="w", buffering=-1, encoding=None, errors=None, newline=None
@@ -166,26 +167,9 @@ def poetry_used(view):
     return False
 
 
-def find_pyproject():
-    view = sublime.active_window().active_view()
+def find_pyproject(view=None):
+    if not view:
+        view = sublime.active_window().active_view()
     pp = partial(find_root_file, view=view, filename="pyproject.toml")()
-    LOG.debug('find_pyproject :%s', pp)
+    LOG.debug("find_pyproject :%s", pp)
     return pp
-
-
-def popen_out(*args, cwd="", **kwargs):
-    if not cwd and cwd is not None: #cover the default but keep non possible
-        cwd = str(find_pyproject().parent)
-    return subprocess.check_output(*args, startupinfo=startup_info(), cwd=cwd, **kwargs)
-
-
-def popen(*args, cwd="", **kwargs):
-    if not cwd and cwd is not None: #cover the default but keep non possible
-        cwd = str(find_pyproject().parent)
-
-    return subprocess.Popen(*args, startupinfo=startup_info(), cwd=cwd, **kwargs)
-
-
-# Partial zone
-# view  = sublime.active_window().active_view()
-# find_pyproject = partial(find_root_file, view = view, filename = "pyproject.toml")

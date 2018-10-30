@@ -3,7 +3,6 @@ from unittest import TestCase
 import tempfile
 import subprocess
 import sublime
-import os
 
 
 poetry = sys.modules["poetry.poetry"]
@@ -34,9 +33,11 @@ PROJECT = """{{
 def create_fake_project(venv=False):
     directory = tempfile.TemporaryDirectory()
     dirpath = Path(directory.name)
-    toml = dirpath / "pyproject.toml"
+    pyproject = dirpath / "pyproject.toml"
     venv = dirpath / ".venv"
     project = dirpath / "bla.sublime-project"
+    project.write_text(PROJECT.format(directory.name))
+    pyproject.write_text(BLANK)
 
     if venv:
         subprocess.check_call(
@@ -44,7 +45,7 @@ def create_fake_project(venv=False):
             cwd=str(dirpath),
             startupinfo=poetry.utils.startup_info(),
         )
-    return directory, dirpath, toml, venv, project
+    return directory, dirpath, pyproject, venv, project
 
 
 class PoetryTestCase(TestCase):

@@ -4,8 +4,8 @@ import tempfile
 import subprocess
 import sublime
 
-poem = sys.modules["poem.poem"]
-Path = poem.utils.Path
+poetry = sys.modules["poetry.poetrylib"]
+Path = poetry.utils.Path
 
 BLANK = """[tool.poetry]
 name = "rien"
@@ -24,36 +24,30 @@ PROJECT = """{{
     [
         {{
                     "path": "."
-        
         }}
     ],
-}}
-"""
+}}"""
 
 
-class PoemTestCase(TestCase):
-    @classmethod
+class PoetryTestCase(TestCase):
     def setUp(self):
+        # sublime :
         window = sublime.active_window()
         window.run_command("new_window")
-        self.dir = tempfile.TemporaryDirectory()
-
-        #sublime :
         self.window = sublime.active_window()
         self.view = self.window.new_file()
 
-        #setup test directory
+
+        # setup test directory
         self.dir = tempfile.TemporaryDirectory()
         self.dirpath = Path(self.dir.name)
         self.toml = self.dirpath / "pyproject.toml"
         self.env = self.dirpath / ".venv"
 
         self.project = self.dirpath / "bla.sublime-project"
-        
 
-        self.old_data = self.window.project_data()
+        # self.old_data = self.window.project_data()
 
-        
         self.init_project()
 
     def tearDown(self):
@@ -62,25 +56,24 @@ class PoemTestCase(TestCase):
             self.view.window().focus_view(self.view)
             self.view.window().run_command("close_file")
 
-        self.window.set_project_data(self.old_data)
+        self.window.run_command('close_window')
 
+        # self.window.set_project_data(self.old_data)
 
-    def create_env(self):
-        self.check_call([poem.compat.PYTHON, "-m", "venv", ".venv"])
-    
-
-
-
+    def create_venv(self):
+        self.check_call([poetry.compat.PYTHON, "-m", "venv", ".venv"])
 
     def popen(self, *args, **kwargs):
         return subprocess.Popen(
-            *args, cwd=str(self.dirpath), startupinfo=poem.utils.startup_info(), **kwargs
+            *args,
+            cwd=str(self.dirpath),
+            startupinfo=poetry.utils.startup_info(),
+            **kwargs
         )
 
-    @classmethod
-    def check_call(cls, *args, **kwargs):
+    def check_call(self, *args, **kwargs):
         return subprocess.check_call(
-            *args, cwd=cls.dir.name, startupinfo=poem.utils.startup_info(), **kwargs
+            *args, cwd=str(self.dirpath), startupinfo=poetry.utils.startup_info(), **kwargs
         )
 
     def init_project(self):

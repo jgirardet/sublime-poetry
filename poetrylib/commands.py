@@ -1,9 +1,9 @@
 import sublime_plugin
 from .utils import get_settings, poetry_used
 from collections import defaultdict
-from .poetry import get_venv_path
+from .poetry_tools import get_venv_path
 
-class PoemSetPythonInterpreterCommand(sublime_plugin.WindowCommand):
+class PoetrySetPythonInterpreterCommand(sublime_plugin.WindowCommand):
     def is_active(self):
         return poetry_used(self.window.active_view())
 
@@ -11,7 +11,7 @@ class PoemSetPythonInterpreterCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         config = get_settings(self.window.active_view())
-        if config["poem_autoset_path"]:
+        if config["poetry_autoset_path"]:
 
             project = defaultdict(dict)
             project.update(self.window.project_data())

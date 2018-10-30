@@ -1,6 +1,6 @@
 environment:
     # The package name
-    PACKAGE: "poem"
+    PACKAGE: "poetry"
     SUBLIME_TEXT_VERSION : "3"
 
 install:

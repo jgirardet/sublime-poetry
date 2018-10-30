@@ -10,20 +10,20 @@
                 "id": "package-settings",
                 "children": [
                     {
-                        "caption": "Poem",
+                        "caption": "Poetry",
                         "children": [
                             {
                                 "caption": "Settings",
                                 "command": "edit_settings",
                                 "args": {
-                                    "base_file": "${packages}/Poem/Poem.sublime-settings"
+                                    "base_file": "${packages}/poetry/poetry.sublime-settings"
                                 },
                             },
                             {
                                 "caption": "Key Bindings",
                                 "command": "edit_settings",
                                 "args": {
-                                    "base_file": "${packages}/Poem/Default ($platform).sublime-keymap"
+                                    "base_file": "${packages}/poetry/Default ($platform).sublime-keymap"
                                 },
                             }
                         ]

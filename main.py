@@ -1,6 +1,6 @@
 """
 
-Poem
+Poetry
 
 Order of imports should not be changed
 """
@@ -8,7 +8,7 @@ import logging
 import sublime
 import os
 
-from .poem import PACKAGE_NAME, get_settings, PoemSetPythonInterpreterCommand  # flake8: noqa
+from .poetrylib import PACKAGE_NAME, get_settings, PoetrySetPythonInterpreterCommand  # flake8: noqa
 
 
 LOG = logging.getLogger(PACKAGE_NAME)
@@ -33,10 +33,10 @@ def plugin_loaded():
         LOG.addHandler(dh)
 
     try:
-        LOG.setLevel(config.get("poem_log", "").upper())
+        LOG.setLevel(config.get("poetry_log", "").upper())
     except ValueError as err:
         LOG.error(err)
         LOG.setLevel("ERROR")
         LOG.error("fallback to loglevel ERROR")
 
-    LOG.info("Loglevel set to %s", config["poem_log"].upper())
+    LOG.info("Loglevel set to %s", config["poetry_log"].upper())

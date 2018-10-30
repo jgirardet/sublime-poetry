@@ -7,16 +7,16 @@
 
 
       // ##########################
-      // Poem specific options #
+      // Poetry specific options #
       // ##########################
 
 
       // set debug mode. default is info
       // choices : debug > info > error
-      "poem_log": "info",
+      "poetry_log": "info",
 
-      "poem_autoset_path": true,
+      "poetry_autoset_path": true,
 
-      "poem_poetry_path": "guess"
+      "poetry_poetry_path": "guess"
  
 }

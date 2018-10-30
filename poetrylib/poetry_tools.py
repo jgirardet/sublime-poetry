@@ -5,10 +5,11 @@ from .utils import popen_out
 from .compat import VENV_BIN_DIR
 import sublime
 import os
+from .consts import PACKAGE_NAME
 # from .consts import PACKAGE_NAME
-# import logging
+import logging
 
-# LOG = logging.getLogger(PACKAGE_NAME)
+LOG = logging.getLogger(PACKAGE_NAME)
 
 
 def poetry_cmd():
@@ -29,6 +30,7 @@ def poetry_cmd():
         # LOG.error(err)
         raise err
 
+    LOG.debug('poetry_cmd : %s', poetry_bin)
     return poetry_bin
 
 
@@ -43,6 +45,7 @@ def get_venv_path():
         .split(b":")[1]
         .strip()
     )
+    LOG.debug("get_venv_path : %s", venv.decode())
     if venv and venv != b"NA":
         python_interpreter = Path(venv.decode()) / VENV_BIN_DIR / "python"
         return python_interpreter

@@ -1,11 +1,11 @@
 from unittest import TestCase
 
-from fixtures import poem, PoemTestCase, BLANK
+from fixtures import poetry, PoetryTestCase, BLANK
 import sublime
 
-class TestPoem(PoemTestCase):
-    def test_poem(self):
-        self.assertEqual(poem.PACKAGE_NAME, "Poem")
+class TestPoetry(PoetryTestCase):
+    def test_poetry(self):
+        self.assertEqual(poetry.PACKAGE_NAME, "poetry")
 
     # def test_open(self):
 

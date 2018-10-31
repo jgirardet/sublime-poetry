@@ -4,6 +4,7 @@ from fixtures import poetry, create_fake_project
 from pathlib import Path
 import subprocess
 import sublime
+import os
 
 Poetry = poetry.poetry.Poetry
 
@@ -35,4 +36,11 @@ class TestPoetry(TestCase):
     def test_venv(self):
         directory, dirpath, pyproject, venv, project = create_fake_project()
         self.poetry._cwd = dirpath
-        self.assertEqual(self.poetry.venv, dirpath / ".venv")
+        if (
+            "TRAVIS" in os.environ and os.environ["TRAVIS_OS_NAME"] == "linux"
+        ):  # because poetry ignore .venv ifVIRTUAL_ENV set
+            new_venv = Path(os.environ["VIRTUAL_ENV"])
+        else:
+            new_venv = venv
+
+        self.assertEqual(self.poetry.venv, new_venv)

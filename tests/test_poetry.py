@@ -7,13 +7,18 @@ import sublime
 
 Poetry = poetry.poetry.Poetry
 
-window = sublime.active_window()
-
 
 class TestPoetry(TestCase):
     def setUp(self):
         self.window = sublime.active_window()
         self.poetry = Poetry(self.window)
+        self.view = self.window.new_file()
+
+    def tearDown(self):
+        if self.view:
+            self.view.set_scratch(True)
+            self.view.window().focus_view(self.view)
+            self.view.window().run_command("close_file")
 
     def test_get_poetry_cmd_no_config(self):
         """return current poetry_binary via recommanded install"""

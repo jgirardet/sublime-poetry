@@ -11,8 +11,8 @@ Poetry = poetry.poetry.Poetry
 class TestPoetry(TestCase):
     def setUp(self):
         self.window = sublime.active_window()
-        self.poetry = Poetry(self.window)
         self.view = self.window.new_file()
+        self.poetry = Poetry(self.window)
 
     def tearDown(self):
         if self.view:

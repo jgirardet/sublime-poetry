@@ -43,4 +43,4 @@ class TestPoetry(TestCase):
         else:
             new_venv = venv
 
-        self.assertEqual(self.poetry.venv, new_venv)
+        self.assertEqual(self.poetry.venv.resolve(), new_venv.resolve())

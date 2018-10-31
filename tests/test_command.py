@@ -15,9 +15,9 @@ class TestPoetry(PoetryTestCase):
         if (
             "TRAVIS" in os.environ and os.environ["TRAVIS_OS_NAME"] == "linux"
         ):  # because poetry ignore .venv ifVIRTUAL_ENV set
-            base = Path(os.environ["VIRTUAL_ENV"])
+            base = Path(os.environ["VIRTUAL_ENV"]).resolve()
         else:
-            base = self.venv
+            base = self.venv.resolve()
         self.assertEqual(
             project_data,
             {

@@ -3,6 +3,7 @@ import os
 import re
 import subprocess
 
+import sublime
 
 from .consts import PACKAGE_NAME
 from .utils import Path, startup_info
@@ -21,6 +22,8 @@ class Poetry:
         self.cmd = self.get_poetry_cmd()
         self.pyproject = find_pyproject(view=self.view)
         self._cwd = self.pyproject.parent if self.pyproject else None
+
+        self.platform = sublime.platform()
 
     @property
     def cwd(self):
@@ -52,11 +55,16 @@ class Poetry:
 
     def run(self, command):
         """run a poetry command in current directory"""
+        shell = True if self.platform == "windows" else None
         cmd = command.split()
         cmd.insert(0, self.cmd)
         try:
             return subprocess.check_output(
-                cmd, startupinfo=startup_info(), cwd=self.cwd, stderr=subprocess.STDOUT
+                cmd,
+                startupinfo=startup_info(),
+                cwd=self.cwd,
+                stderr=subprocess.STDOUT,
+                shell=shell,
             )
         except subprocess.CalledProcessError as err:
             LOG.error(

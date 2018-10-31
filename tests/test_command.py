@@ -25,3 +25,7 @@ class TestPoetry(PoetryTestCase):
                 "folders": [{"path": self.dir.name}],
             },
         )
+
+    def test_install(self):
+        self.create_venv()
+        self.window.run_command("poetry_install")

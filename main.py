@@ -8,12 +8,14 @@ import logging
 import sublime
 import os
 
-from .poetry import (
-    PACKAGE_NAME,
-    get_settings,
-    PoetrySetPythonInterpreterCommand,
-)  # flake8: noqa
+# from .poetry import (
+#     PACKAGE_NAME,
+#     get_settings,
+#     PoetrySetPythonInterpreterCommand,
+#     PoetryInstallCommand,
+# )  # flake8: noqa
 
+from .poetry import *
 
 LOG = logging.getLogger(PACKAGE_NAME)
 
@@ -45,5 +47,5 @@ def plugin_loaded():
 
     LOG.info("Loglevel set to %s", config["poetry_log"].upper())
 
-    if os.environ.get("CI", None):
-        LOG.setLevel("DEBUG")
+    # if os.environ.get("CI", None):
+    #     LOG.setLevel("DEBUG")

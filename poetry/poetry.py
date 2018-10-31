@@ -59,13 +59,14 @@ class Poetry:
         cmd = command.split()
         cmd.insert(0, self.cmd)
         try:
-            return subprocess.check_output(
+            output = subprocess.check_output(
                 cmd,
                 startupinfo=startup_info(),
                 cwd=self.cwd,
                 stderr=subprocess.STDOUT,
                 shell=shell,
             )
+
         except subprocess.CalledProcessError as err:
             LOG.error(
                 "Poetry run for command %s failed with return_code %d and the following output:\n%s",
@@ -75,6 +76,9 @@ class Poetry:
             )
             LOG.debug("Poetry vars at fail: %s", vars(self))
             raise
+        else:
+            LOG.debug('output of command "%s" : %s', command, output.decode())
+            return output
 
     @property
     def venv(self):

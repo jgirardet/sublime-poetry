@@ -5,7 +5,7 @@ import sublime_plugin
 
 from .poetry import Poetry
 from .compat import VENV_BIN_DIR
-from .utils import poetry_used
+from .utils import poetry_used, timed
 from .consts import PACKAGE_NAME
 
 LOG = logging.getLogger(PACKAGE_NAME)
@@ -33,4 +33,12 @@ class PoetryInstallCommand(PoetryCommand):
     def run(self):
         self.poetry = Poetry(self.window)
         output = self.poetry.run("install")
+        LOG.debug(output)
+
+
+class PoetryInstallNoDevCommand(PoetryCommand):
+    @timed
+    def run(self):
+        self.poetry = Poetry(self.window)
+        output = self.poetry.run("install --no-dev")
         LOG.debug(output)

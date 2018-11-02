@@ -6,7 +6,7 @@ class TestPoetry(PoetryTestCase):
         self.assertEqual(poetry.PACKAGE_NAME, "poetry")
 
     def test_test_case(self):
-        self.assertEqual(self.toml.read_text(), BLANK)
+        self.assertEqual(self.pyproject.read_text(), BLANK)
         self.assertEqual(
             str(self.dirpath), self.window.project_data()["folders"][0]["path"]
         )

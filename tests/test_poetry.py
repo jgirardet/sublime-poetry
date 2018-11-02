@@ -24,7 +24,12 @@ class TestPoetry(TestCase):
     def test_get_poetry_cmd_no_config(self):
         """return current poetry_binary via recommanded install"""
 
-        self.assertEqual(subprocess.check_call([self.poetry.cmd, "--version"]), 0)
+        self.assertEqual(
+            subprocess.check_call(
+                [self.poetry.cmd, "--version"], shell=self.poetry.shell
+            ),
+            0,
+        )
 
     def test_get_poetry_cmd_config(self):
         """return current poetry_binary via config option"""

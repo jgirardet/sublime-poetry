@@ -49,36 +49,34 @@ def create_fake_project(venv=False):
 
 
 class PoetryTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         # sublime :
         window = sublime.active_window()
         window.run_command("new_window")
-        self.window = sublime.active_window()
-        self.view = self.window.new_file()
+        cls.window = sublime.active_window()
+        cls.view = cls.window.new_file()
 
-        # setup test directory
-        self.dir = tempfile.TemporaryDirectory()
-        self.dirpath = Path(self.dir.name)
-        self.toml = self.dirpath / "pyproject.toml"
-        self.venv = self.dirpath / ".venv"
+        # project
+        directory, dirpath, pyproject, venv, project = create_fake_project(venv=True)
+        cls.dir = directory
+        cls.dirpath = dirpath
+        cls.pyproject = pyproject
+        cls.venv = venv
+        cls.project = project
 
-        self.project = self.dirpath / "bla.sublime-project"
+        cls.window.set_project_data({"folders": [{"path": str(cls.dirpath)}]})
 
-        # self.old_data = self.window.project_data()
+    @classmethod
+    def tearDownClass(cls):
+        if cls.view:
+            cls.view.set_scratch(True)
+            cls.view.window().focus_view(cls.view)
+            cls.view.window().run_command("close_file")
 
-        self.init_project()
+        cls.window.run_command("close_window")
 
-    def tearDown(self):
-        if self.view:
-            self.view.set_scratch(True)
-            self.view.window().focus_view(self.view)
-            self.view.window().run_command("close_file")
-
-        self.window.run_command("close_window")
-
-        self.dir.cleanup()
-
-        # self.window.set_project_data(self.old_data)
+        cls.dir.cleanup()
 
     def create_venv(self):
         self.check_call([poetry.compat.PYTHON, "-m", "venv", ".venv"])
@@ -98,8 +96,3 @@ class PoetryTestCase(TestCase):
             startupinfo=poetry.utils.startup_info(),
             **kwargs
         )
-
-    def init_project(self):
-        self.project.write_text(PROJECT.format(self.dir.name))
-        self.window.set_project_data({"folders": [{"path": str(self.dirpath)}]})
-        self.toml.write_text(BLANK)

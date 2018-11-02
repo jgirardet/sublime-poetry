@@ -4,11 +4,14 @@ from pathlib import Path
 
 
 class TestPoetry(PoetryTestCase):
+    # @classmethod
+    # def setUpClass(cls):
+    #     super().setUpClass()
+
     def test_poetry_package_name(self):
         self.assertEqual(poetry.PACKAGE_NAME, "poetry")
 
     def test_set_python_interpreter(self):
-        self.create_venv()
         self.window.run_command("poetry_set_python_interpreter")
         project_data = self.window.project_data()
 
@@ -27,5 +30,8 @@ class TestPoetry(PoetryTestCase):
         )
 
     def test_install(self):
-        self.create_venv()
         self.window.run_command("poetry_install")
+        self.assertTrue((self.dirpath / "poetry.lock").exists())
+
+    def test_install_no_dev(self):
+        self.window.run_command("poetry_install_no_dev")

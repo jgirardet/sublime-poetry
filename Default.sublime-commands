@@ -3,4 +3,11 @@
         "caption": "Poetry: Set python interpreter",
         "command": "poetry_set_python_interpreter"
     },
+    {
+        "caption": "Poetry: Install",
+        "command": "poetry_install"
+    },    {
+        "caption": "Poetry: Install",
+        "command": "poetry_install_no_dev"
+    },
 ]

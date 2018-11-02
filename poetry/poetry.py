@@ -23,7 +23,7 @@ class Poetry:
         self.pyproject = find_pyproject(view=self.view)
         self._cwd = self.pyproject.parent if self.pyproject else None
 
-        self.platform = sublime.platform()
+        self.shell = True if sublime.platform() == "windows" else None
 
     @property
     def cwd(self):
@@ -55,30 +55,38 @@ class Poetry:
 
     def run(self, command):
         """run a poetry command in current directory"""
-        shell = True if self.platform == "windows" else None
         cmd = command.split()
         cmd.insert(0, self.cmd)
-        try:
-            output = subprocess.check_output(
-                cmd,
-                startupinfo=startup_info(),
-                cwd=self.cwd,
-                stderr=subprocess.STDOUT,
-                shell=shell,
-            )
+        self.popen = subprocess.Popen(
+            cmd,
+            startupinfo=startup_info(),
+            cwd=self.cwd,
+            stderr=subprocess.STDOUT,
+            stdout=subprocess.PIPE,
+            shell=self.shell,
+        )
 
-        except subprocess.CalledProcessError as err:
-            LOG.error(
-                "Poetry run for command %s failed with return_code %d and the following output:\n%s",
-                err.cmd,
-                err.returncode,
-                err.output.decode(),
-            )
-            LOG.debug("Poetry vars at fail: %s", vars(self))
-            raise
-        else:
-            LOG.debug('output of command "%s" : %s', command, output.decode())
-            return output
+    @property
+    def poll(self):
+        return self.pope.poll()
+
+    def check_run(self):
+
+        if self.output == None:
+            return None
+
+        # except subprocess.CalledProcessError as err:
+        #     LOG.error(
+        #         "Poetry run for command %s failed with return_code %d and the following output:\n%s",
+        #         err.cmd,
+        #         err.returncode,
+        #         err.output.decode(),
+        #     )
+        #     LOG.debug("Poetry vars at fail: %s", vars(self))
+        #     raise
+        # else:
+        #     LOG.debug('output of command "%s" : %s', command, output.decode())
+        #     return output
 
     @property
     def venv(self):

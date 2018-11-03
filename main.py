@@ -17,6 +17,7 @@ if not os.environ.get("CI", None):
     LOG.propagate = False
 
 
+
 def plugin_loaded():
     # load config
     current_view = sublime.active_window().active_view()
@@ -39,7 +40,11 @@ def plugin_loaded():
         LOG.setLevel("ERROR")
         LOG.error("fallback to loglevel ERROR")
 
+
     LOG.info("Loglevel set to %s", config["poetry_log"].upper())
+
+
+    tweak_theme()
 
     # if os.environ.get("CI", None):
     #     LOG.setLevel("DEBUG")

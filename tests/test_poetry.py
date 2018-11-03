@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from fixtures import poetry, create_fake_project
 from pathlib import Path
 import subprocess
@@ -49,3 +49,11 @@ class TestPoetry(TestCase):
             new_venv = venv
 
         self.assertEqual(self.poetry.venv.resolve(), new_venv.resolve())
+
+
+    def test_output(self):
+        self.poetry.popen =  MagicMock()
+        self.assertEqual(self.poetry.output, self.poetry.popen.stdout.read.return_value)
+
+        self.poetry.output
+        self.poetry.popen.stdout.read.assert_called_once_with()

@@ -1,5 +1,6 @@
 from collections import defaultdict
 import logging
+from queue import Queue
 
 import sublime_plugin
 
@@ -7,11 +8,15 @@ from .poetry import Poetry
 from .compat import VENV_BIN_DIR
 from .utils import poetry_used, timed
 from .consts import PACKAGE_NAME
+from .command_runner import PoetryThread
 
 LOG = logging.getLogger(PACKAGE_NAME)
 
 
 class PoetryCommand(sublime_plugin.WindowCommand):
+    def __init__(self, window):
+        super().__init__(window)
+        self.output = Queue(maxsize=1)
     def is_active(self):
         return poetry_used(self.window.active_view())
 
@@ -31,9 +36,9 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
 
 class PoetryInstallCommand(PoetryCommand):
     def run(self):
-        self.poetry = Poetry(self.window)
-        output = self.poetry.run("install")
-        LOG.debug(output)
+        poetry = Poetry(self.window)     
+        runner = PoetryThread('install',poetry, self.output)
+        runner.start()
 
 
 class PoetryInstallNoDevCommand(PoetryCommand):

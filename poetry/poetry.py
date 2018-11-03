@@ -25,6 +25,8 @@ class Poetry:
 
         self.shell = True if sublime.platform() == "windows" else None
 
+        self._output = None
+
     @property
     def cwd(self):
         if self._cwd:
@@ -68,7 +70,13 @@ class Poetry:
 
     @property
     def poll(self):
-        return self.pope.poll()
+        return self.popen.poll()
+
+    @property
+    def output(self):
+        if self._output is None:
+            self._output = self.popen.stdout.read()
+        return self._output
 
     def check_run(self):
 
@@ -90,7 +98,8 @@ class Poetry:
 
     @property
     def venv(self):
-        out = self.run("debug:info")
+        self.run("debug:info")
+        out = self.output
         venv = (
             re.search(rb"Virtualenv(?:\n.*)* \* (Path:.+)", out)
             .group(1)

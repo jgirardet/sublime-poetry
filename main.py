@@ -16,6 +16,7 @@ LOG = logging.getLogger(PACKAGE_NAME)
 if not os.environ.get("CI", None):
     LOG.propagate = False
 
+# LOG.propagate = True
 
 
 def plugin_loaded():
@@ -40,9 +41,7 @@ def plugin_loaded():
         LOG.setLevel("ERROR")
         LOG.error("fallback to loglevel ERROR")
 
-
     LOG.info("Loglevel set to %s", config["poetry_log"].upper())
-
 
     tweak_theme()
 

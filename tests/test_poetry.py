@@ -39,7 +39,7 @@ class TestPoetry(TestCase):
         self.assertEqual(self.poetry.get_poetry_cmd(), __file__)
 
     def test_venv(self):
-        directory, dirpath, pyproject, venv, project = create_fake_project()
+        directory, dirpath, pyproject, venv, project = create_fake_project(venv=True)
         self.poetry._cwd = dirpath
         if (
             "TRAVIS" in os.environ and os.environ["TRAVIS_OS_NAME"] == "linux"

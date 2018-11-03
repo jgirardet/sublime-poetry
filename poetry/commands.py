@@ -21,7 +21,6 @@ class PoetryCommand(sublime_plugin.WindowCommand):
 
     def init_command(self):
         self.poetry = Poetry(self.window)
-        self.output = Queue(maxsize=1)
 
 
 class PoetrySetPythonInterpreterCommand(PoetryCommand):
@@ -38,15 +37,14 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
 class PoetryInstallCommand(PoetryCommand):
     def run(self):
         self.init_command()
-        runner = PoetryThread("install", self.poetry, self.output)
+        runner = PoetryThread("install", self.poetry)
         runner.start()
-        ThreadProgress(runner, "installed")
+        ThreadProgress(runner)
 
 
 class PoetryInstallNoDevCommand(PoetryCommand):
-    @timed
     def run(self):
         self.init_command()
-        runner = PoetryThread("install --no-devd", self.poetry, self.output)
+        runner = PoetryThread("install --no-dev", self.poetry)
         runner.start()
-        ThreadProgress(runner, "installed No dev")
+        ThreadProgress(runner)

@@ -17,6 +17,7 @@ authors = ["Jimmy Girardet <ijkl@netc.fr>"]
 
 [tool.poetry.dependencies]
 python = "*"
+# toml  = "^0.8"
 
 [tool.poetry.dev-dependencies]"""
 
@@ -35,18 +36,22 @@ def create_fake_project(venv=False):
     directory = tempfile.TemporaryDirectory()
     dirpath = Path(directory.name)
     pyproject = dirpath / "pyproject.toml"
-    venv = dirpath / ".venv"
+    venv_path = dirpath / ".venv"
     project = dirpath / "bla.sublime-project"
     project.write_text(PROJECT.format(directory.name))
     pyproject.write_text(BLANK)
+    (dirpath / ".gitignore").write_text(".venv/")
 
     if venv:
         subprocess.check_call(
-            [poetry.compat.PYTHON, "-m", "venv", ".venv"],
+            # [poetry.compat.PYTHON, "-m", "venv", ".venv"],
+            # ["/usr/bin/python3.7", "-m", "venv", ".venv"],
+            "python3 -m venv .venv",
             cwd=str(dirpath),
             startupinfo=poetry.utils.startup_info(),
+            shell=True,
         )
-    return directory, dirpath, pyproject, venv, project
+    return directory, dirpath, pyproject, venv_path, project
 
 
 class PoetryTestCase(TestCase):

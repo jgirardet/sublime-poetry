@@ -1,8 +1,8 @@
 from collections import defaultdict
 import logging
-from queue import Queue
 
 import sublime_plugin
+import sublime
 
 from .poetry import Poetry
 from .compat import VENV_BIN_DIR
@@ -19,13 +19,24 @@ class PoetryCommand(sublime_plugin.WindowCommand):
 
     is_enabled = is_active
 
-    def init_command(self):
+    def run_command(self, command, *args):
         self.poetry = Poetry(self.window)
+        runner = PoetryThread(command, self.poetry, *args)
+        runner.start()
+        ThreadProgress(runner)
+
+    def run_input_command(self, caption, command, custom=""):
+        if custom:
+            self.run_command(command, custom)
+        else:
+            self.window.show_input_panel(
+                caption, "", lambda x: self.run_command(command, x), None, None
+            )
 
 
 class PoetrySetPythonInterpreterCommand(PoetryCommand):
     def run(self):
-        self.init_command()
+        self.poetry = Poetry(self.window)
         project = defaultdict(dict)
         project.update(self.window.project_data())
         python_interpreter = self.poetry.venv / VENV_BIN_DIR / "python"
@@ -36,15 +47,24 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
 
 class PoetryInstallCommand(PoetryCommand):
     def run(self):
-        self.init_command()
-        runner = PoetryThread("install", self.poetry)
-        runner.start()
-        ThreadProgress(runner)
+        self.run_command("install")
 
 
 class PoetryInstallNoDevCommand(PoetryCommand):
     def run(self):
-        self.init_command()
-        runner = PoetryThread("install --no-dev", self.poetry)
-        runner.start()
-        ThreadProgress(runner)
+        self.run_command("install --no-dev")
+
+
+class PoetryAddCommand(PoetryCommand):
+    def run(self, custom=""):
+        self.run_input_command("Poetry add", "add", custom)
+
+
+class PoetryAddDevCommand(PoetryCommand):
+    def run(self, custom=""):
+        self.run_input_command("Poetry add", "add -D", custom)
+
+
+# remove
+# removedev
+# update

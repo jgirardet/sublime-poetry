@@ -16,7 +16,7 @@ description = ""
 authors = ["Jimmy Girardet <ijkl@netc.fr>"]
 
 [tool.poetry.dependencies]
-python = "*"
+python = "^3.5"
 # toml  = "^0.8"
 
 [tool.poetry.dev-dependencies]"""

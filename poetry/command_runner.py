@@ -10,10 +10,12 @@ LOG = logging.getLogger(PACKAGE_NAME)
 
 
 class PoetryThread(threading.Thread):
-    def __init__(self, command, poetry):
+    def __init__(self, command, poetry, *args):
         threading.Thread.__init__(self)
         self.poetry = poetry
-        self.command = command
+        args = list(args)
+        args.insert(0, command)
+        self.command = " ".join(args)
 
     def run(self):
         LOG.debug("starting %s", self.command)
@@ -50,7 +52,7 @@ class ThreadProgress:
         self.size = 8
         self.last_view = None
         self.window = None
-        
+
         sublime.set_timeout(lambda: self.run(0), 100)
 
     def run(self, i):
@@ -63,7 +65,7 @@ class ThreadProgress:
             self.last_view.erase_status(PACKAGE_NAME)
             self.last_view = None
 
-        flash_status_bar("poetry_is_orange", "hide")
+        flash_status_bar("poetry_is_orange", "show")
         flash_status_bar("poetry_is_red", "hide")
         flash_status_bar("poetry_is_green", "hide")
         self.active_view.erase_status(PACKAGE_NAME)

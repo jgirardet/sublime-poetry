@@ -10,4 +10,12 @@
         "caption": "Poetry: Install --no-dev",
         "command": "poetry_install_no_dev"
     },
+    {
+        "caption": "Poetry: Add a package",
+        "command": "poetry_add"
+    },
+    {
+        "caption": "Poetry: Add dev package",
+        "command": "poetry_add_dev"
+    },
 ]

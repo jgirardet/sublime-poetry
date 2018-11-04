@@ -50,9 +50,8 @@ class TestPoetry(TestCase):
 
         self.assertEqual(self.poetry.venv.resolve(), new_venv.resolve())
 
-
     def test_output(self):
-        self.poetry.popen =  MagicMock()
+        self.poetry.popen = MagicMock()
         self.assertEqual(self.poetry.output, self.poetry.popen.stdout.read.return_value)
 
         self.poetry.output

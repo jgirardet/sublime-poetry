@@ -24,4 +24,8 @@
         "caption": "Poetry: Add dev package",
         "command": "poetry_add_dev"
     },
+    {
+        "caption": "Poetry: Remove package",
+        "command": "poetry_remove"
+    },
 ]

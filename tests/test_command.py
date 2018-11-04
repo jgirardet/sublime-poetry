@@ -23,7 +23,7 @@ class TestInstall(PoetryDeferredTestCase):
     def tearDown(self):
         self.view.erase_status(poetry.PACKAGE_NAME)
 
-    def test_a_set_python_interpreter(self):
+    def test_aa_set_python_interpreter(self):
         self.window.run_command("poetry_set_python_interpreter")
         project_data = self.window.project_data()
 
@@ -83,19 +83,32 @@ class TestInstall(PoetryDeferredTestCase):
         yield self.status
         self.assert_in_toml("toml")
 
-    def test_d_update(self):
-        toml_content = toml.loads(self.pyproject.read_text())
-        toml_content["tool"]["poetry"]["dependencies"] = {}
-        self.pyproject.write_text(toml.dumps(toml_content))
-        self.window.run_command("poetry_update")
-        self.assert_not_in_toml('toml')
 
-    def test_e_add_dev(self):
+    def test_f_add_dev(self):
 
         self.window.run_command("poetry_add_dev", args={"custom": "tomlkit"})
         yield self.status
         self.assert_in_toml("tomlkit", "dev")
 
+
+    def test_g_remove(self):
+
+        self.window.run_command("poetry_remove", args={"custom": "toml"})
+        yield self.status
+        self.assert_not_in_toml("toml")
+
+    def test_h_remove_dev(self):
+
+        self.window.run_command("poetry_remove", args={"custom": "-D tomlkit"})
+        yield self.status
+        self.assert_not_in_toml("tomlkit", "dev")
+
+    def test_i_update(self):
+        toml_content = toml.loads(self.pyproject.read_text())
+        toml_content["tool"]["poetry"]["dependencies"] = {}
+        self.pyproject.write_text(toml.dumps(toml_content))
+        self.window.run_command("poetry_update")
+        self.assert_not_in_toml('toml')
 
 # # class TestAddRemovePackage(PoetryDeferredTestCase)
 #     @patch(poetry.commands.PoetryCommand.window.show_input_panel)

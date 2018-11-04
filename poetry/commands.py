@@ -70,6 +70,32 @@ class PoetryAddDevCommand(PoetryCommand):
         self.run_input_command("Poetry add", "add -D", custom)
 
 
-# remove
-# removedev
-# update
+class PoetryRemoveCommand(PoetryCommand):
+    def remove_callback(self, id):
+        choice = self.packages[id]
+        dev = "-D" if "dev" in choice else ""
+        package = choice.split()[0]
+
+        self.run_command("remove", dev, package)
+
+    def run(self, custom=""):
+        self.poetry = Poetry(self.window)
+        base, dev = self.poetry.packages
+        dev_normalized = [
+            " ".join((name, "   ", str(version), "  **dev** ")) for name, version in dev
+        ]
+        base_normalized = [
+            " ".join((name, "   ", str(version)))
+            for name, version in base
+            if name != "python"
+        ]
+
+        self.packages = base_normalized + dev_normalized
+
+        if custom:
+            self.run_command("remove", custom)
+        else:
+            self.window.show_quick_panel(
+                base_normalized + dev_normalized,
+                lambda choice: self.remove_callback(choice),
+            )

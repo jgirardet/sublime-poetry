@@ -4,6 +4,7 @@ import re
 import subprocess
 
 import sublime
+import toml
 
 from .consts import PACKAGE_NAME
 from .utils import Path, startup_info
@@ -111,3 +112,10 @@ class Poetry:
             return Path(venv)
         else:
             raise FileNotFoundError("Virtualenv not found")
+
+    @property
+    def packages(self):
+        content = toml.loads(self.pyproject.read_text())
+        base = sorted(content["tool"]["poetry"]["dependencies"].items())
+        dev = sorted(content["tool"]["poetry"]["dev-dependencies"].items())
+        return base, dev

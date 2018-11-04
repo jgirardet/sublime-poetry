@@ -8,6 +8,7 @@ from .commands import (
     PoetryUpdateCommand,
     PoetryAddCommand,
     PoetryAddDevCommand,
+    PoetryRemoveCommand
 )
 
 # __all__ = ['PACKAGE_NAME', "get_settings"]
@@ -21,4 +22,5 @@ __all__ = [
     "PoetryUpdateCommand",
     "PoetryAddCommand",
     "PoetryAddDevCommand",
+    "PoetryRemoveCommand"
 ]

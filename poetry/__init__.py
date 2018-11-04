@@ -5,6 +5,7 @@ from .commands import (
     PoetrySetPythonInterpreterCommand,
     PoetryInstallCommand,
     PoetryInstallNoDevCommand,
+    PoetryUpdateCommand,
     PoetryAddCommand,
     PoetryAddDevCommand,
 )
@@ -17,6 +18,7 @@ __all__ = [
     "PoetrySetPythonInterpreterCommand",
     "PoetryInstallCommand",
     "PoetryInstallNoDevCommand",
+    "PoetryUpdateCommand",
     "PoetryAddCommand",
     "PoetryAddDevCommand",
 ]

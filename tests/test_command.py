@@ -7,6 +7,11 @@ import toml
 
 
 class TestInstall(PoetryDeferredTestCase):
+    """
+    Tests are ordered-named since unittest follows
+    alphabetical order
+    """
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -18,7 +23,7 @@ class TestInstall(PoetryDeferredTestCase):
     def tearDown(self):
         self.view.erase_status(poetry.PACKAGE_NAME)
 
-    def test_set_python_interpreter(self):
+    def test_a_set_python_interpreter(self):
         self.window.run_command("poetry_set_python_interpreter")
         project_data = self.window.project_data()
 
@@ -46,14 +51,14 @@ class TestInstall(PoetryDeferredTestCase):
             self.result = False
             return True
 
-    def test_install(self):
+    def test_a_install(self):
 
         self.window.run_command("poetry_install")
         yield self.status
         self.assertEqual(self.result, True)
         (self.dirpath / "poetry.lock").unlink()
 
-    def test_install_no_dev(self):
+    def test_b_install_no_dev(self):
         self.window.run_command("poetry_install_no_dev")
 
         yield self.status
@@ -72,13 +77,20 @@ class TestInstall(PoetryDeferredTestCase):
         section = "dev-dependencies" if section == "dev" else section
         self.assertNotIn(content, toml_content["tool"]["poetry"][section])
 
-    def test_add(self):
+    def test_c_add(self):
 
         self.window.run_command("poetry_add", args={"custom": "toml"})
         yield self.status
         self.assert_in_toml("toml")
 
-    def test_add_dev(self):
+    def test_d_update(self):
+        toml_content = toml.loads(self.pyproject.read_text())
+        toml_content["tool"]["poetry"]["dependencies"] = {}
+        self.pyproject.write_text(toml.dumps(toml_content))
+        self.window.run_command("poetry_update")
+        self.assert_not_in_toml('toml')
+
+    def test_e_add_dev(self):
 
         self.window.run_command("poetry_add_dev", args={"custom": "tomlkit"})
         yield self.status

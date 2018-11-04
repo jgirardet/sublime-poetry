@@ -6,10 +6,16 @@
     {
         "caption": "Poetry: Install",
         "command": "poetry_install"
-    },    {
+    },
+    {
         "caption": "Poetry: Install --no-dev",
         "command": "poetry_install_no_dev"
     },
+    {
+        "caption": "Poetry: Update",
+        "command": "poetry_update"
+    },
+
     {
         "caption": "Poetry: Add a package",
         "command": "poetry_add"

@@ -55,6 +55,11 @@ class PoetryInstallNoDevCommand(PoetryCommand):
         self.run_command("install --no-dev")
 
 
+class PoetryUpdateCommand(PoetryCommand):
+    def run(self):
+        self.run_command("update")
+
+
 class PoetryAddCommand(PoetryCommand):
     def run(self, custom=""):
         self.run_input_command("Poetry add", "add", custom)

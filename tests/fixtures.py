@@ -16,7 +16,7 @@ description = ""
 authors = ["Jimmy Girardet <ijkl@netc.fr>"]
 
 [tool.poetry.dependencies]
-python = "^3.5"
+python = "*"
 # toml  = "^0.8"
 
 [tool.poetry.dev-dependencies]"""
@@ -46,7 +46,7 @@ def create_fake_project(venv=False):
         subprocess.check_call(
             # [poetry.compat.PYTHON, "-m", "venv", ".venv"],
             # ["/usr/bin/python3.7", "-m", "venv", ".venv"],
-            "python3 -m venv .venv",
+            "{} -m venv .venv".format(poetry.compat.PYTHON),
             cwd=str(dirpath),
             startupinfo=poetry.utils.startup_info(),
             shell=True,

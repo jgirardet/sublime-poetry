@@ -11,6 +11,8 @@ sublime-poetry
 
 `Poetry`_ integration for SublimeText
 
+.. image:: poetry.gif
+
 
 * License : GNU General Public License v3 or later (GPLv3+) 
 * Source: https://github.com/jgirardet/sublime-poetry

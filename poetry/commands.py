@@ -35,7 +35,7 @@ class PoetryCommand(sublime_plugin.WindowCommand):
 
 
 class PoetrySetPythonInterpreterCommand(PoetryCommand):
-    def _run(self):
+    def run(self):
         self.poetry = Poetry(self.window)
         project = defaultdict(dict)
         project.update(self.window.project_data())
@@ -44,9 +44,6 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
         project["settings"]["python_interpreter"] = str(python_interpreter)
 
         self.window.set_project_data(project)
-
-    def run(self):
-        sublime.set_timeout_async(self._run, 0)
 
 
 class PoetryInstallCommand(PoetryCommand):

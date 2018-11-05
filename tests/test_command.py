@@ -25,7 +25,6 @@ class TestInstall(PoetryDeferredTestCase):
 
     def test_aa_set_python_interpreter(self):
         self.window.run_command("poetry_set_python_interpreter")
-        yield 1000
         project_data = self.window.project_data()
 
         if (
@@ -34,6 +33,9 @@ class TestInstall(PoetryDeferredTestCase):
             base = Path(os.environ["VIRTUAL_ENV"]).resolve()
         else:
             base = self.venv.resolve()
+
+        if sublime.platform() == "windows":
+            base = Path(str(base).lower())
 
         self.assertEqual(
             project_data,

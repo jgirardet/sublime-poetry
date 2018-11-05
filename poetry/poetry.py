@@ -23,8 +23,8 @@ class Poetry:
         self.cmd = self.get_poetry_cmd()
         self.pyproject = find_pyproject(view=self.view)
         self._cwd = self.pyproject.parent if self.pyproject else None
-
-        self.shell = True if sublime.platform() == "windows" else None
+        self.platform = sublime.platform()
+        self.shell = True if self.platform == "windows" else None
 
         self._output = None
 
@@ -62,7 +62,7 @@ class Poetry:
         cmd.insert(0, self.cmd)
         self.popen = subprocess.Popen(
             cmd,
-            startupinfo=startup_info(),
+            # startupinfo=startup_info(),
             cwd=self.cwd,
             stderr=subprocess.STDOUT,
             stdout=subprocess.PIPE,
@@ -101,12 +101,12 @@ class Poetry:
     def venv(self):
         self.run("debug:info")
         out = self.output
-        venv = (
-            re.search(rb"Virtualenv(?:\n.*)* \* (Path:.+)", out)
-            .group(1)
-            .split(b":")[1]
-            .strip()
-        ).decode()
+        if self.platform == "windows":
+            regex = rb"Virtualenv(?:\r\r\n.*)* \* (Path:.+)"
+        else:
+            regex = rb"Virtualenv(?:\n.*)* \* (Path:.+)"
+
+        venv = (re.search(regex, out).group(1).split()[-1].strip()).decode()
         LOG.debug("get_venv_path : %s", venv)
         if venv != b"NA":
             return Path(venv)

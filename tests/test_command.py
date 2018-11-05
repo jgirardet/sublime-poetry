@@ -25,6 +25,7 @@ class TestInstall(PoetryDeferredTestCase):
 
     def test_aa_set_python_interpreter(self):
         self.window.run_command("poetry_set_python_interpreter")
+        yield 1000
         project_data = self.window.project_data()
 
         if (
@@ -33,6 +34,7 @@ class TestInstall(PoetryDeferredTestCase):
             base = Path(os.environ["VIRTUAL_ENV"]).resolve()
         else:
             base = self.venv.resolve()
+
         self.assertEqual(
             project_data,
             {
@@ -83,13 +85,11 @@ class TestInstall(PoetryDeferredTestCase):
         yield self.status
         self.assert_in_toml("toml")
 
-
     def test_f_add_dev(self):
 
         self.window.run_command("poetry_add_dev", args={"custom": "tomlkit"})
         yield self.status
         self.assert_in_toml("tomlkit", "dev")
-
 
     def test_g_remove(self):
 
@@ -108,14 +108,4 @@ class TestInstall(PoetryDeferredTestCase):
         toml_content["tool"]["poetry"]["dependencies"] = {}
         self.pyproject.write_text(toml.dumps(toml_content))
         self.window.run_command("poetry_update")
-        self.assert_not_in_toml('toml')
-
-# # class TestAddRemovePackage(PoetryDeferredTestCase)
-#     @patch(poetry.commands.PoetryCommand.window.show_input_panel)
-#     def test_add(self):
-
-#         self.window.run_command("poetry_add")
-#         yield self.status
-#         self.assertTrue((self.dirpath / "poetry.lock").exists())
-#         self.assertEqual(self.result, True)
-#         (self.dirpath / "poetry.lock").unlink()
+        self.assert_not_in_toml("toml")

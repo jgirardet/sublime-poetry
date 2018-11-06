@@ -81,27 +81,27 @@ constrant = "^2.1"'''
             ),
         )
 
-    def test_packages_temfile(self):
-        tomlfile = b'''[tool.poetry.dependencies]
-python = "*"
-# toml  = "^0.8"
-all = "*"
-constrant = "^2.1"
-[tool.poetry.dev-dependencies]
-all = "*"
-constrant = "^2.1"'''
+#     def test_packages_temfile(self):
+#         tomlfile = b'''[tool.poetry.dependencies]
+# python = "*"
+# # toml  = "^0.8"
+# all = "*"
+# constrant = "^2.1"
+# [tool.poetry.dev-dependencies]
+# all = "*"
+# constrant = "^2.1"'''
 
-        with tempfile.NamedTemporaryFile() as t:
-            t.write(tomlfile)
-            t.flush()
+#         with tempfile.NamedTemporaryFile() as t:
+#             t.write(tomlfile)
+#             t.flush()
 
-            p = Poetry(self.window)
-            p.pyproject = Path(t.name)
+#             p = Poetry(self.window)
+#             p.pyproject = Path(t.name)
 
-            self.assertEqual(
-                p.packages,
-                (
-                    [("all", "*"), ("constrant", "^2.1"), ("python", "*")],
-                    [("all", "*"), ("constrant", "^2.1")],
-                ),
-            )
+#             self.assertEqual(
+#                 p.packages,
+#                 (
+#                     [("all", "*"), ("constrant", "^2.1"), ("python", "*")],
+#                     [("all", "*"), ("constrant", "^2.1")],
+#                 ),
+#             )

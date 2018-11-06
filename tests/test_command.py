@@ -4,24 +4,14 @@ from pathlib import Path
 import sublime
 import time
 import toml
+import unittest
 
 
-class TestInstall(PoetryDeferredTestCase):
-    """
-    Tests are ordered-named since unittest follows
-    alphabetical order
-    """
+class TestInterpreter(PoetryDeferredTestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-    def setUp(self):
-        self.view.erase_status(poetry.PACKAGE_NAME)
-        self.result = None
-
-    def tearDown(self):
-        self.view.erase_status(poetry.PACKAGE_NAME)
+    # @classmethod
+    # def setUpClass(cls):
+    #     super().setUpClass()
 
     def test_aa_set_python_interpreter(self):
         self.window.run_command("poetry_set_python_interpreter")
@@ -40,10 +30,28 @@ class TestInstall(PoetryDeferredTestCase):
         self.assertEqual(
             project_data,
             {
-                "settings": {"python_interpreter": str(base / "bin" / "python")},
+                "settings": {
+                    "python_interpreter": str(
+                        base / poetry.compat.VENV_BIN_DIR / "python"
+                    )
+                },
                 "folders": [{"path": self.dir.name}],
             },
         )
+
+# @unittest.skip('feef')
+class TestPackageCommand(PoetryDeferredTestCase):
+    """
+    Tests are ordered-named since unittest follows
+    alphabetical order
+    """
+
+    def setUp(self):
+        self.view.erase_status(poetry.PACKAGE_NAME)
+        self.result = None
+
+    def tearDown(self):
+        self.view.erase_status(poetry.PACKAGE_NAME)
 
     def status(self):
 

@@ -4,7 +4,7 @@ import tempfile
 import subprocess
 import sublime
 from unittesting import DeferrableTestCase
-
+import shutil
 
 poetry = sys.modules["poetry.poetry"]
 Path = poetry.utils.Path
@@ -132,7 +132,8 @@ class PoetryDeferredTestCase(DeferrableTestCase):
 
         cls.window.run_command("close_window")
 
-        cls.dir.cleanup()
+        shutil.rmtree(cls.dir.name, ignore_errors=True)
+        # cls.dir.cleanup()
 
     def create_venv(self):
         self.check_call([poetry.compat.PYTHON, "-m", "venv", ".venv"])

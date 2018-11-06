@@ -1,12 +1,13 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from fixtures import poetry, create_fake_project
-from pathlib import Path
 import subprocess
 import sublime
 import os
+import tempfile
 
 Poetry = poetry.poetry.Poetry
+Path = poetry.utils.Path
 
 
 class TestPoetry(TestCase):
@@ -56,3 +57,51 @@ class TestPoetry(TestCase):
 
         self.poetry.output
         self.poetry.popen.stdout.read.assert_called_once_with()
+
+    def test_packages(self):
+        file = Path(tempfile.NamedTemporaryFile(delete=False).name)
+        tomlfile = '''[tool.poetry.dependencies]
+python = "*"
+# toml  = "^0.8"
+all = "*"
+constrant = "^2.1"
+[tool.poetry.dev-dependencies]
+all = "*"
+constrant = "^2.1"'''
+        file.write_text(tomlfile)
+
+        p = Poetry(self.window)
+        p.pyproject = file
+
+        self.assertEqual(
+            p.packages,
+            (
+                [("all", "*"), ("constrant", "^2.1"), ("python", "*")],
+                [("all", "*"), ("constrant", "^2.1")],
+            ),
+        )
+
+    def test_packages_temfile(self):
+        tomlfile = b'''[tool.poetry.dependencies]
+python = "*"
+# toml  = "^0.8"
+all = "*"
+constrant = "^2.1"
+[tool.poetry.dev-dependencies]
+all = "*"
+constrant = "^2.1"'''
+
+        with tempfile.NamedTemporaryFile() as t:
+            t.write(tomlfile)
+            t.flush()
+
+            p = Poetry(self.window)
+            p.pyproject = Path(t.name)
+
+            self.assertEqual(
+                p.packages,
+                (
+                    [("all", "*"), ("constrant", "^2.1"), ("python", "*")],
+                    [("all", "*"), ("constrant", "^2.1")],
+                ),
+            )

@@ -1,9 +1,14 @@
 import itertools
+from collections import OrderedDict
+import logging
 import re
 import subprocess
 import os
 
-from pathlib import Path
+from .consts import PACKAGE_NAME
+from .utils import Path
+
+LOG = logging.getLogger(PACKAGE_NAME)
 
 
 class Pyenv:
@@ -34,6 +39,7 @@ class Pyenv:
         if not self._build:
             self._build = self.as_dict(self.build_path.glob("*"))
             self._build.pop("patches")
+            # LOG.debug("Pyenv build %s", self._build)
 
         return self._build
 
@@ -45,7 +51,7 @@ class Pyenv:
         """
         if not self._versions:
             self._versions = self.as_dict(self.versions_path.glob("*"))
-
+            LOG.debug("Pyenv versions %s", self._versions)
         return self._versions
 
     @property
@@ -60,6 +66,7 @@ class Pyenv:
                 for k, v in self.versions.items()
                 if k in self.build
             }
+            LOG.debug("Peynv base_env : %s", self._base_env)
 
         return self._base_env
 
@@ -76,6 +83,7 @@ class Pyenv:
                 if k not in self.build
             }
 
+            LOG.debug("Peynv base_env : %s", self._venv)
         return self._venv
 
     @staticmethod
@@ -94,7 +102,8 @@ class PythonInterpreter:
         self.pyenv = self._pyenv()
         self.execs_and_pyenv = self._execs_and_pyenv()
 
-    def get_python_version(self, python_executable):
+    @staticmethod
+    def get_python_version(python_executable, default_shell=None):
         """Get exact python version"""
 
         # formatting since print tupple is different for python2 and 3
@@ -104,7 +113,7 @@ class PythonInterpreter:
 
         try:
             version_out = subprocess.check_output(
-                find_version, shell=True, executable=self.default_shell
+                find_version, shell=True, executable=default_shell
             )
         except FileNotFoundError:
             # LOG.debug("is_python3_executable : FileNotFoundError")
@@ -126,6 +135,7 @@ class PythonInterpreter:
             .group(1)
             .split(":")
         )
+        LOG.debug("PythonInterpreter system_paths: %s", system_paths)
         return system_paths
 
     def _execs(self):
@@ -144,8 +154,9 @@ class PythonInterpreter:
 
         for e in sorted(binaries):
             if re.search(r"python\d?\.?\d?$", str(e)):
-                execs[str(e)] = self.get_python_version(str(e))
+                execs[str(e)] = self.get_python_version(str(e), self.default_shell)
 
+        LOG.debug("PythonInterpreter exec: %s", execs)
         return execs
 
     def _pyenv(self):
@@ -156,23 +167,14 @@ class PythonInterpreter:
 
         return Pyenv(self._pyenv_path)
 
-
     def _execs_and_pyenv(self):
         if self.pyenv:
-            return itertools.chain(self.execs, self.pyenv.base_env)
+            duo = dict(self.execs)
+            duo.update(self.pyenv.base_env)
+            res = tuple(sorted(duo.items(), key=lambda t: t[0]))
+            LOG.debug("PythonInterpreter exces and pyenv : %s", res)
+            return  res
 
         else:
             self.execs
 
-
-# if __name__ == "__main__":
-# bp = PythonInterpreter()
-# bp.execs    #
-# print(bp.execs_and_pyenv)
-# import sublime
-# sublime.show_quick_menu(bp.execs_and_pyenv, lambda x: x)
-# p = Pyenv("/home/jimmy/.pyenv")
-# print("\nvenv", p.venv)
-# print("\nbase", p.base_env)
-# print("\nversio", p.versions)
-# print('\nbiuld', p.build)

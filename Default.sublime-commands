@@ -12,6 +12,10 @@
         "command": "poetry_install_no_dev"
     },
     {
+        "caption": "Poetry: Install in Selected Venv",
+        "command": "poetry_install_in_venv"
+    },
+    {
         "caption": "Poetry: Update",
         "command": "poetry_update"
     },

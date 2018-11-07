@@ -8,7 +8,8 @@ import toml
 
 from .consts import PACKAGE_NAME
 from .utils import Path, startup_info
-from .utils import get_settings, find_pyproject
+from .utils import get_settings, find_pyproject, find_root_file
+from .interpreters import PythonInterpreter
 
 
 LOG = logging.getLogger(PACKAGE_NAME)
@@ -119,3 +120,38 @@ class Poetry:
         base = sorted(content["tool"]["poetry"]["dependencies"].items())
         dev = sorted(content["tool"]["poetry"]["dev-dependencies"].items())
         return base, dev
+
+    @property
+    def dot_venv(self):
+        return find_root_file(self.view, ".venv")
+
+    @property
+    def dot_venv_version(self):
+
+        if self.dot_venv:
+            cfg=None
+            pyvenv = self.dot_venv / "pyvenv.cfg"
+            # python 3
+            if pyvenv.exists():
+                cfg = re.search(r"version = (\d.\d.\d)\n", pyvenv.read_text()).group(1)
+
+            # python 2
+            else:
+                cfg = PythonInterpreter.get_python_version(
+                    str(self.dot_venv / "bin" / "python")
+                )
+            LOG.debug('Poetry dot_venv_version :%s', cfg)
+            return cfg
+
+        return ''
+
+    def new_dot_venv(self, path, version):
+        cmd = [path, '-m', "venv"] if version.startswith('3') else ['virtualenv']
+        subprocess.Popen(
+            cmd+['.venv'],
+            # startupinfo=startup_info(),
+            cwd=self.cwd,
+            stderr=subprocess.STDOUT,
+            stdout=subprocess.PIPE,
+            shell=self.shell,
+        )

@@ -1,0 +1,23 @@
+create a venv class outside poetry class
+
+
+command to add:
+
+Needed
+------
+build
+publish
+version
+config : enable/disable options showed
+init
+
+after
+------
+run : nuld system ?
+search
+shell : via terminus ?
+
+bof:
+lock
+check
+show

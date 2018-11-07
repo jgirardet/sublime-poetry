@@ -39,6 +39,7 @@ class TestInterpreter(PoetryDeferredTestCase):
             },
         )
 
+
 # @unittest.skip('feef')
 class TestPackageCommand(PoetryDeferredTestCase):
     """

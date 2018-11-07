@@ -173,8 +173,7 @@ class PythonInterpreter:
             duo.update(self.pyenv.base_env)
             res = tuple(sorted(duo.items(), key=lambda t: t[0]))
             LOG.debug("PythonInterpreter exces and pyenv : %s", res)
-            return  res
+            return res
 
         else:
             self.execs
-

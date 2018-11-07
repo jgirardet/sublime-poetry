@@ -173,4 +173,3 @@ def find_pyproject(view=None):
     pp = partial(find_root_file, view=view, filename="pyproject.toml")()
     LOG.debug("find_pyproject :%s", pp)
     return pp
-

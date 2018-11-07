@@ -63,12 +63,12 @@ class Poetry:
         cmd.insert(0, self.cmd)
         self.popen = subprocess.Popen(
             cmd,
-            # startupinfo=startup_info(),
             cwd=self.cwd,
             stderr=subprocess.STDOUT,
             stdout=subprocess.PIPE,
             shell=self.shell,
         )
+        self.popen.wait(timeout=600)
 
     @property
     def poll(self):
@@ -80,23 +80,23 @@ class Poetry:
             self._output = self.popen.stdout.read()
         return self._output
 
-    def check_run(self):
+    # def check_run(self):
 
-        if self.output == None:
-            return None
+    #     if self.output == None:
+    #         return None
 
-        # except subprocess.CalledProcessError as err:
-        #     LOG.error(
-        #         "Poetry run for command %s failed with return_code %d and the following output:\n%s",
-        #         err.cmd,
-        #         err.returncode,
-        #         err.output.decode(),
-        #     )
-        #     LOG.debug("Poetry vars at fail: %s", vars(self))
-        #     raise
-        # else:
-        #     LOG.debug('output of command "%s" : %s', command, output.decode())
-        #     return output
+    # except subprocess.CalledProcessError as err:
+    #     LOG.error(
+    #         "Poetry run for command %s failed with return_code %d and the following output:\n%s",
+    #         err.cmd,
+    #         err.returncode,
+    #         err.output.decode(),
+    #     )
+    #     LOG.debug("Poetry vars at fail: %s", vars(self))
+    #     raise
+    # else:
+    #     LOG.debug('output of command "%s" : %s', command, output.decode())
+    #     return output
 
     @property
     def venv(self):
@@ -129,7 +129,7 @@ class Poetry:
     def dot_venv_version(self):
 
         if self.dot_venv:
-            cfg=None
+            cfg = None
             pyvenv = self.dot_venv / "pyvenv.cfg"
             # python 3
             if pyvenv.exists():
@@ -140,18 +140,24 @@ class Poetry:
                 cfg = PythonInterpreter.get_python_version(
                     str(self.dot_venv / "bin" / "python")
                 )
-            LOG.debug('Poetry dot_venv_version :%s', cfg)
+            LOG.debug("Poetry dot_venv_version :%s", cfg)
             return cfg
 
-        return ''
+        return ""
 
     def new_dot_venv(self, path, version):
-        cmd = [path, '-m', "venv"] if version.startswith('3') else ['virtualenv']
-        subprocess.Popen(
-            cmd+['.venv'],
-            # startupinfo=startup_info(),
+        module = "venv" if version.startswith("3") else "virtualenv"
+        p = subprocess.Popen(
+            [path, "-m", module, ".venv"],
+            # "{} -m {} .venv".format(path, module),
             cwd=self.cwd,
             stderr=subprocess.STDOUT,
             stdout=subprocess.PIPE,
             shell=self.shell,
         )
+        try:
+            p.wait(timeout=10)
+        except subprocess.TimeoutExpired as err:
+            LOG.debug("new_dot_venv: %s", err.output)
+            return False
+        return self._cwd / ".venv"

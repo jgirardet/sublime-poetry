@@ -31,6 +31,13 @@ class PoetryThread(threading.Thread):
             LOG.debug("Output of command %s : %s", self.command, output.decode())
         else:
             LOG.error("Output of command %s : %s", self.command, output.decode())
+            print(output)
+            panel = self.poetry.window.get_output_panel("poetry")
+            characters = "POETRY ERROR LOG\n\n" + output.decode()
+            panel.run_command("append", args={"characters": characters})
+            self.poetry.window.run_command(
+                "show_panel", args={"panel": "output.poetry"}
+            )
 
 
 class ThreadProgress:

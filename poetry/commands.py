@@ -38,6 +38,9 @@ class PoetryCommand(sublime_plugin.WindowCommand):
 
 class PoetrySetPythonInterpreterCommand(PoetryCommand):
     def run(self):
+        sublime.set_timeout_async(self._run, 0)
+
+    def _run(self):
         self.poetry = Poetry(self.window)
         project = defaultdict(dict)
         project.update(self.window.project_data())
@@ -120,21 +123,18 @@ class PoetryInstallInVenvCommand(PoetryCommand):
                 LOG.debug("Install command interupted by user")
                 return
 
-        shutil.rmtree(str(self.poetry.venv))
+        if self.poetry.venv.exists():
+            shutil.rmtree(str(self.poetry.venv))
 
-        sublime.set_timeout_async(lambda: self.create_and_install(path, version))
+        sublime.set_timeout_async(lambda: self.create_and_install(path, version), 0)
 
-    def run(self, custom=""):
+    def run(self):
         self.poetry = Poetry(self.window)
         self.interpreters = []
-        # for i in PythonInterpreter().execs_and_pyenv:
         self.python_interpreter = PythonInterpreter()
         for i in self.python_interpreter.execs_and_pyenv:
             self.interpreters.append("{}  {}".format(*i))
 
-        if custom:
-            self.run_command("remove", custom)
-        else:
-            self.window.show_quick_panel(
-                self.interpreters, lambda choice: self.callback(choice)
-            )
+        self.window.show_quick_panel(
+            self.interpreters, lambda choice: self.callback(choice)
+        )

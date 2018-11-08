@@ -5,6 +5,7 @@ import subprocess
 import sublime
 from unittesting import DeferrableTestCase
 import shutil
+import toml
 
 poetry = sys.modules["poetry.poetry"]
 Path = poetry.utils.Path
@@ -84,24 +85,25 @@ class PoetryTestCase(TestCase):
 
         cls.dir.cleanup()
 
-    def create_venv(self):
-        self.check_call([poetry.compat.PYTHON, "-m", "venv", ".venv"])
+    def status(self):
 
-    def popen(self, *args, **kwargs):
-        return subprocess.Popen(
-            *args,
-            cwd=str(self.dirpath),
-            startupinfo=poetry.utils.startup_info(),
-            **kwargs
-        )
+        if "succes" in self.view.get_status("poetry"):
+            self.result = True
+            return True
 
-    def check_call(self, *args, **kwargs):
-        return subprocess.check_call(
-            *args,
-            cwd=str(self.dirpath),
-            startupinfo=poetry.utils.startup_info(),
-            **kwargs
-        )
+        if "fail" in self.view.get_status("poetry"):
+            self.result = False
+            return True
+
+    def assert_in_toml(self, content, section="dependencies"):
+        toml_content = toml.loads(self.pyproject.read_text())
+        section = "dev-dependencies" if section == "dev" else section
+        self.assertIn(content, toml_content["tool"]["poetry"][section])
+
+    def assert_not_in_toml(self, content, section="dependencies"):
+        toml_content = toml.loads(self.pyproject.read_text())
+        section = "dev-dependencies" if section == "dev" else section
+        self.assertNotIn(content, toml_content["tool"]["poetry"][section])
 
 
 class PoetryDeferredTestCase(DeferrableTestCase):
@@ -133,7 +135,15 @@ class PoetryDeferredTestCase(DeferrableTestCase):
         cls.window.run_command("close_window")
 
         shutil.rmtree(cls.dir.name, ignore_errors=True)
+        # shutil.rmtree(cls.dir.name)
         # cls.dir.cleanup()
+
+    def setUp(self):
+        self.view.erase_status(poetry.PACKAGE_NAME)
+        self.result = None
+
+    def tearDown(self):
+        self.view.erase_status(poetry.PACKAGE_NAME)
 
     def create_venv(self):
         self.check_call([poetry.compat.PYTHON, "-m", "venv", ".venv"])
@@ -153,3 +163,23 @@ class PoetryDeferredTestCase(DeferrableTestCase):
             startupinfo=poetry.utils.startup_info(),
             **kwargs
         )
+
+    def status(self):
+
+        if "succes" in self.view.get_status("poetry"):
+            self.result = True
+            return True
+
+        if "fail" in self.view.get_status("poetry"):
+            self.result = False
+            return True
+
+    def assert_in_toml(self, content, section="dependencies"):
+        toml_content = toml.loads(self.pyproject.read_text())
+        section = "dev-dependencies" if section == "dev" else section
+        self.assertIn(content, toml_content["tool"]["poetry"][section])
+
+    def assert_not_in_toml(self, content, section="dependencies"):
+        toml_content = toml.loads(self.pyproject.read_text())
+        section = "dev-dependencies" if section == "dev" else section
+        self.assertNotIn(content, toml_content["tool"]["poetry"][section])

@@ -61,6 +61,7 @@ class Poetry:
         """run a poetry command in current directory"""
         cmd = command.split()
         cmd.insert(0, self.cmd)
+        LOG.debug("Poetry::run : command = %s", cmd)
         self.popen = subprocess.Popen(
             cmd,
             cwd=self.cwd,
@@ -68,7 +69,6 @@ class Poetry:
             stdout=subprocess.PIPE,
             shell=self.shell,
         )
-        self.popen.wait(timeout=600)
 
     @property
     def poll(self):

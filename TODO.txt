@@ -5,7 +5,6 @@ command to add:
 
 Needed
 ------
-build
 publish
 version
 config : enable/disable options showed
@@ -21,3 +20,6 @@ bof:
 lock
 check
 show
+
+done:
+build

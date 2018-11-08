@@ -143,4 +143,3 @@ class PoetryInstallInVenvCommand(PoetryCommand):
 class PoetryBuildCommand(PoetryCommand):
     def run(self):
         self.run_poetry_command("build")
-

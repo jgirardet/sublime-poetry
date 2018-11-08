@@ -48,6 +48,9 @@ Use `Ctrl-Shift-P` (Mac: `Cmd-Shift-P`). A pyproject.toml file with a poetry sec
 * Poetry: Install --no-dev:
     Run `poetry install --no-dev` on current project.
 
+* Poetry: Install in Selected Venv:
+    Find Available python interpreters on system and create .venv with selected python version then Run `poetry install` on current project.
+
 * Poetry: Update:
     Run `poetry update` on current project.
 

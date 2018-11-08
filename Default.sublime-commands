@@ -32,4 +32,8 @@
         "caption": "Poetry: Remove package",
         "command": "poetry_remove"
     },
+    {
+        "caption": "Poetry: Build package",
+        "command": "poetry_build"
+    },
 ]

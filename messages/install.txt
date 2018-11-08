@@ -9,3 +9,13 @@ Installation
 
 Changelog
 -----------
+
+
+To come :
+	add PoetryInstallInVenvCommand
+	add PetryBuild
+0.1.0:
+	add PetrySetPythonInterpreter command
+	add install/no dev
+	add update
+	add add/remove package

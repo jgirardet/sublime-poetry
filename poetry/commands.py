@@ -21,7 +21,7 @@ class PoetryCommand(sublime_plugin.WindowCommand):
 
     is_enabled = is_active
 
-    def run_command(self, command, *args):
+    def run_poetry_command(self, command, *args):
         self.poetry = Poetry(self.window)
         runner = PoetryThread(command, self.poetry, *args)
         runner.start()
@@ -29,10 +29,10 @@ class PoetryCommand(sublime_plugin.WindowCommand):
 
     def run_input_command(self, caption, command, custom=""):
         if custom:
-            self.run_command(command, custom)
+            self.run_poetry_command(command, custom)
         else:
             self.window.show_input_panel(
-                caption, "", lambda x: self.run_command(command, x), None, None
+                caption, "", lambda x: self.run_poetry_command(command, x), None, None
             )
 
 
@@ -53,17 +53,17 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
 
 class PoetryInstallCommand(PoetryCommand):
     def run(self):
-        self.run_command("install")
+        self.run_poetry_command("install")
 
 
 class PoetryInstallNoDevCommand(PoetryCommand):
     def run(self):
-        self.run_command("install --no-dev")
+        self.run_poetry_command("install --no-dev")
 
 
 class PoetryUpdateCommand(PoetryCommand):
     def run(self):
-        self.run_command("update")
+        self.run_poetry_command("update")
 
 
 class PoetryAddCommand(PoetryCommand):
@@ -82,7 +82,7 @@ class PoetryRemoveCommand(PoetryCommand):
         dev = "-D" if "dev" in choice else ""
         package = choice.split()[0]
 
-        self.run_command("remove", dev, package)
+        self.run_poetry_command("remove", dev, package)
 
     def run(self, custom=""):
         self.poetry = Poetry(self.window)
@@ -99,7 +99,7 @@ class PoetryRemoveCommand(PoetryCommand):
         self.packages = base_normalized + dev_normalized
 
         if custom:
-            self.run_command("remove", custom)
+            self.run_poetry_command("remove", custom)
         else:
             self.window.show_quick_panel(
                 base_normalized + dev_normalized,
@@ -138,3 +138,9 @@ class PoetryInstallInVenvCommand(PoetryCommand):
         self.window.show_quick_panel(
             self.interpreters, lambda choice: self.callback(choice)
         )
+
+
+class PoetryBuildCommand(PoetryCommand):
+    def run(self):
+        self.run_poetry_command("build")
+

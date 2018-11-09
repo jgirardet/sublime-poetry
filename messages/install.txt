@@ -11,9 +11,10 @@ Changelog
 -----------
 
 
-To come :
+0.2.0 :
 	add PoetryInstallInVenvCommand
 	add PetryBuild
+	remove toml dir
 0.1.0:
 	add PetrySetPythonInterpreter command
 	add install/no dev

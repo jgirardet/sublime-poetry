@@ -2,6 +2,7 @@
    "*": {
       "*": [
          "pathlib",
+         "python-toml"
       ]
    }
 }

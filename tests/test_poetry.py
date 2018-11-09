@@ -39,9 +39,9 @@ class TestPoetry(TestCase):
 
         self.assertEqual(self.poetry.get_poetry_cmd(), __file__)
 
-    def test_venv(self):
+    def test_used_venv(self):
         directory, dirpath, pyproject, venv, project = create_fake_project(venv=True)
-        self.poetry._cwd = dirpath
+        self.poetry.pyproject = pyproject
         if (
             "TRAVIS" in os.environ and os.environ["TRAVIS_OS_NAME"] == "linux"
         ):  # because poetry ignore .venv ifVIRTUAL_ENV set
@@ -49,14 +49,14 @@ class TestPoetry(TestCase):
         else:
             new_venv = venv
 
-        self.assertEqual(self.poetry.venv.resolve(), new_venv.resolve())
+        self.assertEqual(self.poetry.used_venv().resolve(), new_venv.resolve())
 
     def test_output(self):
         self.poetry.popen = MagicMock()
-        self.assertEqual(self.poetry.output, self.poetry.popen.stdout.read.return_value)
 
         self.poetry.output
         self.poetry.popen.stdout.read.assert_called_once_with()
+
 
     def test_packages(self):
         file = Path(tempfile.NamedTemporaryFile(delete=False).name)

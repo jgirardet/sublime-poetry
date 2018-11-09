@@ -7,6 +7,8 @@ from .consts import (
     KEY_ERROR_MARKER,
 )
 
+import importlib.util
+
 import pathlib
 import subprocess
 import signal
@@ -131,23 +133,22 @@ def find_root_file(view, filename):
     return None
 
 
+# def read_pyproject_toml(pyproject: Path) -> dict:
+#     """Return config options foud in pyproject"""
+#     config = {}
+#     if not pyproject:
+#         LOG.debug("No pyproject.toml file found")
+#         return {}
 
-def read_pyproject_toml(pyproject: Path) -> dict:
-    """Return config options foud in pyproject"""
-    config = {}
-    if not pyproject:
-        LOG.debug("No pyproject.toml file found")
-        return {}
+#     try:
+#         pyproject_toml = toml.load(str(pyproject))
+#         config = pyproject_toml.get("tool", {}).get("black", {})
+#     except (toml.TomlDecodeError, OSError) as e:
+#         LOG.error("Error reading configuration file: %s", pyproject)
+#         # pass
 
-    try:
-        pyproject_toml = toml.load(str(pyproject))
-        config = pyproject_toml.get("tool", {}).get("black", {})
-    except (toml.TomlDecodeError, OSError) as e:
-        LOG.error("Error reading configuration file: %s", pyproject)
-        # pass
-
-    LOG.debug("config values extracted from %s : %r", pyproject, config)
-    return config
+#     LOG.debug("config values extracted from %s : %r", pyproject, config)
+#     return config
 
 
 def poetry_used(view):
@@ -165,3 +166,13 @@ def find_pyproject(view=None):
     pp = partial(find_root_file, view=view, filename="pyproject.toml")()
     LOG.debug("find_pyproject :%s", pp)
     return pp
+
+
+def import_module_from_path(name: str, path: str):
+
+    # spec = importlib.util.spec_from_file_location(name, path)
+    loader = importlib.machinery.SourceFileLoader(name, path)
+    # module = importlib.util.module_from_spec(spec)
+    module = loader.load_module()
+    # spec.loader.exec_module(module)
+    return module

@@ -3,10 +3,10 @@ import shutil
 
 
 class TestPackagingCommands(PoetryDeferredTestCase):
-    # def setUp(self):
-    #     super().setUp()
-    #     if (self.dirpath / "poetry.lock").exists():
-    #         (self.dirpath / "poetry.lock").unlink()
+    def setUp(self):
+        super().setUp()
+        if (self.dirpath / "poetry.lock").exists():
+            (self.dirpath / "poetry.lock").unlink()
 
     @classmethod
     def setUpClass(cls):

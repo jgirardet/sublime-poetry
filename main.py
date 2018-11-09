@@ -16,7 +16,6 @@ LOG = logging.getLogger(PACKAGE_NAME)
 if not os.environ.get("CI", None):
     LOG.propagate = False
 
-# LOG.propagate = True
 
 
 def plugin_loaded():
@@ -27,7 +26,7 @@ def plugin_loaded():
     # Setup  logging
     if not LOG.handlers:
         debug_formatter = logging.Formatter(
-            "[{}:%(filename)s](%(levelname)s) %(message)s".format(PACKAGE_NAME)
+            "[{}:%(filename)s:%(lineno)d](%(levelname)s) %(message)s".format(PACKAGE_NAME)
         )
         dh = logging.StreamHandler()
         dh.setLevel(logging.DEBUG)
@@ -45,5 +44,5 @@ def plugin_loaded():
 
     tweak_theme()
 
-    # if os.environ.get("CI", None):
-    #     LOG.setLevel("DEBUG")
+    if os.environ.get("CI", None):
+        LOG.setLevel("DEBUG")

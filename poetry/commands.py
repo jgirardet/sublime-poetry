@@ -5,7 +5,7 @@ import shutil
 import sublime_plugin
 import sublime
 
-from .poetry import Poetry
+from .poetry import Poetry, Venv
 from .compat import VENV_BIN_DIR
 from .utils import poetry_used, timed
 from .consts import PACKAGE_NAME
@@ -44,7 +44,7 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
         self.poetry = Poetry(self.window)
         project = defaultdict(dict)
         project.update(self.window.project_data())
-        python_interpreter = self.poetry.venv / VENV_BIN_DIR / "python"
+        python_interpreter = self.poetry.used_venv() / VENV_BIN_DIR / "python"
 
         project["settings"]["python_interpreter"] = str(python_interpreter)
 
@@ -109,13 +109,13 @@ class PoetryRemoveCommand(PoetryCommand):
 
 class PoetryInstallInVenvCommand(PoetryCommand):
     def create_and_install(self, path, version):
-        if self.poetry.new_dot_venv(path, version):
+        if Venv.create(path, version, self.poetry.cwd):
             self.window.run_command("poetry_install")
 
     def callback(self, id):
         path, version = self.python_interpreter.execs_and_pyenv[id]
         LOG.debug("using %s", path)
-        if version == self.poetry.dot_venv_version:
+        if version == self.poetry.venv.version:
             go_on = sublime.ok_cancel_dialog(
                 ".venv is already with version {}. Continue ?".format(version)
             )

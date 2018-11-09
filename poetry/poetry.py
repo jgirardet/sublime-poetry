@@ -8,31 +8,132 @@ import toml
 
 from .consts import PACKAGE_NAME
 from .utils import Path, startup_info
-from .utils import get_settings, find_pyproject, find_root_file
+from .utils import get_settings, find_pyproject, find_root_file, import_module_from_path
 from .interpreters import PythonInterpreter
 
 
 LOG = logging.getLogger(PACKAGE_NAME)
 
 
+class Venv:
+    """
+    Class managing the .venv path inside poetry, projects
+    """
+
+    def __init__(self, view=None, cwd=None):
+
+        if cwd is not None:
+            self.cwd = cwd if isinstance(cwd, Path) else Path(cwd)
+        else:
+            self.cwd = None
+
+        self.view = view if view else sublime.active_window().active_view()
+
+    def exists(self):
+        return bool(self.path.exists())
+
+    @property
+    def path(self):
+        if not self.cwd:
+            return find_root_file(self.view, ".venv")
+        return self.cwd / ".venv"
+
+    @property
+    def version(self):
+        """python version
+
+        str(mja min micro)
+        """
+
+        if self:
+            cfg = None
+            pyvenv = self.path / "pyvenv.cfg"
+            # python 3
+            if pyvenv.exists():
+                cfg = re.search(r"version = (\d.\d.\d)\n", pyvenv.read_text()).group(1)
+
+            # python 2
+            else:
+                cfg = PythonInterpreter.get_python_version(
+                    str(self.path / "bin" / "python")
+                )
+            LOG.debug(".venv python version  :%s", cfg)
+            return cfg
+
+        return ""
+
+    @classmethod
+    def create(cls, path, version, cwd, view=None):
+        """Create new .venv according python version
+
+        path : path to interpreter
+        version : python version
+        cwd: directory (PAth or str)
+
+        Return: Path(new_venv)
+        """
+
+        if not isinstance(cwd, Path):
+            cwd = Path(cwd)
+
+        shell = True if sublime.platform() == "windows" else None
+
+        module = "venv" if version.startswith("3") else "virtualenv"
+        p = subprocess.Popen(
+            [path, "-m", module, ".venv"],
+            # "{} -m {} .venv".format(path, module),
+            cwd=str(cwd),
+            stderr=subprocess.STDOUT,
+            stdout=subprocess.PIPE,
+            shell=shell,
+        )
+        try:
+            p.wait(timeout=10)
+        except subprocess.TimeoutExpired as err:
+            LOG.debug("new_dot_venv: %s", err.output)
+            return False
+        return cls(cwd=cwd, view=view)
+
+
 class Poetry:
-    def __init__(self, window):
+    def __init__(self, window,):
         self.window = window
         self.view = window.active_view()
         self.config = get_settings(self.view)
 
-        self.cmd = self.get_poetry_cmd()
         self.pyproject = find_pyproject(view=self.view)
-        self._cwd = self.pyproject.parent if self.pyproject else None
+
+        self.cmd = self.get_poetry_cmd()
+
+        self._venv = None
+
         self.platform = sublime.platform()
         self.shell = True if self.platform == "windows" else None
 
-        self._output = None
+    @property
+    def venv(self):
+        if not self._venv:
+            return Venv(self.view, self.cwd)
+        return self._venv
 
     @property
     def cwd(self):
-        if self._cwd:
-            return str(self._cwd)
+        return self.pyproject.parent
+
+    def used_venv(self):
+        self.run("debug:info")
+        out = self.output
+        if self.platform == "windows":
+            regex = rb"Virtualenv(?:\r\r\n.*)* \* (Path:.+)"
+        else:
+            regex = rb"Virtualenv(?:\n.*)* \* (Path:.+)"
+
+        venv = (re.search(regex, out).group(1).split()[-1].strip()).decode()
+        LOG.debug("get_venv_path : %s", venv)
+        if venv != b"NA":
+            return Path(venv)
+        else:
+            return None
 
     def get_poetry_cmd(self):
         """
@@ -64,11 +165,15 @@ class Poetry:
         LOG.debug("Poetry::run : command = %s", cmd)
         self.popen = subprocess.Popen(
             cmd,
-            cwd=self.cwd,
+            cwd=str(self.cwd),
             stderr=subprocess.STDOUT,
             stdout=subprocess.PIPE,
             shell=self.shell,
         )
+
+    @property
+    def poetry_root(self):
+        return Path(self.cmd).parents[1]
 
     @property
     def poll(self):
@@ -76,43 +181,7 @@ class Poetry:
 
     @property
     def output(self):
-        if self._output is None:
-            self._output = self.popen.stdout.read()
-        return self._output
-
-    # def check_run(self):
-
-    #     if self.output == None:
-    #         return None
-
-    # except subprocess.CalledProcessError as err:
-    #     LOG.error(
-    #         "Poetry run for command %s failed with return_code %d and the following output:\n%s",
-    #         err.cmd,
-    #         err.returncode,
-    #         err.output.decode(),
-    #     )
-    #     LOG.debug("Poetry vars at fail: %s", vars(self))
-    #     raise
-    # else:
-    #     LOG.debug('output of command "%s" : %s', command, output.decode())
-    #     return output
-
-    @property
-    def venv(self):
-        self.run("debug:info")
-        out = self.output
-        if self.platform == "windows":
-            regex = rb"Virtualenv(?:\r\r\n.*)* \* (Path:.+)"
-        else:
-            regex = rb"Virtualenv(?:\n.*)* \* (Path:.+)"
-
-        venv = (re.search(regex, out).group(1).split()[-1].strip()).decode()
-        LOG.debug("get_venv_path : %s", venv)
-        if venv != b"NA":
-            return Path(venv)
-        else:
-            raise FileNotFoundError("Virtualenv not found")
+        return self.popen.stdout.read()
 
     @property
     def packages(self):
@@ -121,43 +190,22 @@ class Poetry:
         dev = sorted(content["tool"]["poetry"]["dev-dependencies"].items())
         return base, dev
 
-    @property
-    def dot_venv(self):
-        return find_root_file(self.view, ".venv")
-
-    @property
-    def dot_venv_version(self):
-
-        if self.dot_venv:
-            cfg = None
-            pyvenv = self.dot_venv / "pyvenv.cfg"
-            # python 3
-            if pyvenv.exists():
-                cfg = re.search(r"version = (\d.\d.\d)\n", pyvenv.read_text()).group(1)
-
-            # python 2
-            else:
-                cfg = PythonInterpreter.get_python_version(
-                    str(self.dot_venv / "bin" / "python")
-                )
-            LOG.debug("Poetry dot_venv_version :%s", cfg)
-            return cfg
-
-        return ""
-
-    def new_dot_venv(self, path, version):
-        module = "venv" if version.startswith("3") else "virtualenv"
-        p = subprocess.Popen(
-            [path, "-m", module, ".venv"],
-            # "{} -m {} .venv".format(path, module),
-            cwd=self.cwd,
-            stderr=subprocess.STDOUT,
-            stdout=subprocess.PIPE,
-            shell=self.shell,
+    def appdirs(self):
+        appdirs = import_module_from_path(
+            "appdirs", str(self.poetry_root / "lib" / "poetry" / "utils" / "appdirs.py")
         )
-        try:
-            p.wait(timeout=10)
-        except subprocess.TimeoutExpired as err:
-            LOG.debug("new_dot_venv: %s", err.output)
-            return False
-        return self._cwd / ".venv"
+
+        return {
+            "cache": Path(appdirs.user_cache_dir("pypoetry")),
+            "config": Path(appdirs.user_config_dir("pypoetry")),
+        }
+
+    @property
+    def poetry_config(self):
+        # if not self._config:
+        self._config = {}
+        config_dir = self.appdirs()["config"]
+        for file in ["auth.toml", "config.toml"]:
+            self._config.update(toml.loads((config_dir / file).read_text()))
+
+        return self._config

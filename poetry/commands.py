@@ -147,9 +147,6 @@ class PoetryBuildCommand(PoetryCommand):
 
 
 class PoetryPublishCommand(PoetryCommand):
-    def _set_credentials(self, value):
-        pass
-
     def get_credential(self, target_repo):
         # then check fpr username and password
         for method, repos in self.poetry.auth.items():
@@ -157,7 +154,7 @@ class PoetryPublishCommand(PoetryCommand):
                 if repo == target_repo:
                     return values["username"], values["password"]
 
-            return False
+        return None
 
     def run_publish(self, credos):
         if not credos:
@@ -171,7 +168,7 @@ class PoetryPublishCommand(PoetryCommand):
 
             self.run_poetry_command(" ".join(cmd))
 
-    def set_repo(self, choice):
+    def setup_publish(self, choice):
         if choice == "pypi":
             self.repo = choice
         elif choice == -1:
@@ -208,10 +205,10 @@ class PoetryPublishCommand(PoetryCommand):
 
             repo = None
             selected = self.window.show_quick_panel(
-                self.repos, lambda choice: self.set_repo(choice)
+                self.repos, lambda choice: self.setup_publish(choice)
             )
         else:
-            self.set_repo("pypi")
+            self.setup_publish("pypi")
 
         # check for credential if repo
 

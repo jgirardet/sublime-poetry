@@ -22,7 +22,8 @@ class PoetryCommand(sublime_plugin.WindowCommand):
     is_enabled = is_active
 
     def run_poetry_command(self, command, *args):
-        self.poetry = Poetry(self.window)
+        if not hasattr(self, "poetry"):
+            self.poetry = Poetry(self.window)
         runner = PoetryThread(command, self.poetry, *args)
         runner.start()
         ThreadProgress(runner)
@@ -41,7 +42,7 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
         sublime.set_timeout_async(self._run, 0)
 
     def _run(self):
-        self.poetry = Poetry(self.window)
+
         project = defaultdict(dict)
         project.update(self.window.project_data())
         python_interpreter = self.poetry.used_venv() / VENV_BIN_DIR / "python"
@@ -143,3 +144,75 @@ class PoetryInstallInVenvCommand(PoetryCommand):
 class PoetryBuildCommand(PoetryCommand):
     def run(self):
         self.run_poetry_command("build")
+
+
+class PoetryPublishCommand(PoetryCommand):
+    def _set_credentials(self, value):
+        pass
+
+    def get_credential(self, target_repo):
+        # then check fpr username and password
+        for method, repos in self.poetry.auth.items():
+            for repo, values in repos.items():
+                if repo == target_repo:
+                    return values["username"], values["password"]
+
+            return False
+
+    def run_publish(self, credos):
+        if not credos:
+            return
+        else:
+            cmd = ["publish"]
+            if self.repo != "pypi":
+                cmd.append("--repository={}".format(self.repo))
+
+            cmd.append("--username={} --password={}".format(*credos))
+
+            self.run_poetry_command(" ".join(cmd))
+
+    def set_repo(self, choice):
+        if choice == "pypi":
+            self.repo = choice
+        elif choice == -1:
+            return
+        else:
+
+            self.repo = self.repos[choice]
+
+        print(self.repo)
+
+        credos = self.get_credential(self.repo)
+
+        print(credos)
+
+        if not credos:
+            self.window.show_input_panel(
+                "username password",
+                "",
+                lambda x: self.run_publish(x.split()),
+                None,
+                self.run_publish(False),
+            )
+        else:
+            self.run_publish(credos)
+
+    def run(self):
+        self.repo = None
+        self.poetry = Poetry(self.window)
+        # if many repo : choose repo
+        self.repos = list(self.poetry.config["repositories"].keys())
+        selected = None
+        if self.repos:
+            self.repos.insert(0, "pypi")
+
+            repo = None
+            selected = self.window.show_quick_panel(
+                self.repos, lambda choice: self.set_repo(choice)
+            )
+        else:
+            self.set_repo("pypi")
+
+        # check for credential if repo
+
+        # run command

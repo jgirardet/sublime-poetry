@@ -57,7 +57,6 @@ class TestPoetry(TestCase):
         self.poetry.output
         self.poetry.popen.stdout.read.assert_called_once_with()
 
-
     def test_packages(self):
         file = Path(tempfile.NamedTemporaryFile(delete=False).name)
         tomlfile = '''[tool.poetry.dependencies]

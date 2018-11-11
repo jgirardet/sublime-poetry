@@ -36,4 +36,9 @@
         "caption": "Poetry: Build package",
         "command": "poetry_build"
     },
+
+    {
+        "caption": "Poetry: Publish package",
+        "command": "poetry_publish"
+    },
 ]

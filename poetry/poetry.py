@@ -96,12 +96,13 @@ class Venv:
 
 
 class Poetry:
-    def __init__(self, window,):
+    def __init__(self, window, cwd=None):
         self.window = window
         self.view = window.active_view()
-        self.config = get_settings(self.view)
+        self.settings = get_settings(self.view)
 
         self.pyproject = find_pyproject(view=self.view)
+        self._cwd = cwd
 
         self.cmd = self.get_poetry_cmd()
 
@@ -118,6 +119,8 @@ class Poetry:
 
     @property
     def cwd(self):
+        if self._cwd:
+            return Path(self._cwd)
         return self.pyproject.parent
 
     def used_venv(self):
@@ -141,8 +144,8 @@ class Poetry:
         Includes a workaround for http://bugs.python.org/issue14768
         code from sdispatcher/poetry
         """
-        if self.config["poetry_binary"]:
-            poetry_bin = Path(self.config["poetry_binary"])
+        if self.settings["poetry_binary"]:
+            poetry_bin = Path(self.settings["poetry_binary"])
 
         else:
 
@@ -201,11 +204,27 @@ class Poetry:
         }
 
     @property
-    def poetry_config(self):
+    def auth(self):
         # if not self._config:
-        self._config = {}
         config_dir = self.appdirs()["config"]
-        for file in ["auth.toml", "config.toml"]:
-            self._config.update(toml.loads((config_dir / file).read_text()))
+        auth = toml.loads((config_dir / "auth.toml").read_text())
+
+        return auth
+
+    @property
+    def config(self):
+        # if not self._config:
+        self.run("config --list")
+        self._config = toml.loads(self.output.decode())
+
+        # long = []
+
+        # for cle in self._config:
+        #     for sous_cle in self._config[cle]:
+        #         for ss_cle in  self._config[cle][sous_cle]:
+        #             long.append((cle, sous_cle, ss_cle))
+
+        # for file in ["auth.toml", "config.toml"]:
+        #     self._config.update(toml.loads((config_dir / file).read_text()))
 
         return self._config

@@ -17,7 +17,6 @@ if not os.environ.get("CI", None):
     LOG.propagate = False
 
 
-
 def plugin_loaded():
     # load config
     current_view = sublime.active_window().active_view()
@@ -26,7 +25,9 @@ def plugin_loaded():
     # Setup  logging
     if not LOG.handlers:
         debug_formatter = logging.Formatter(
-            "[{}:%(filename)s:%(lineno)d](%(levelname)s) %(message)s".format(PACKAGE_NAME)
+            "[{}:%(filename)s:%(lineno)d](%(levelname)s) %(message)s".format(
+                PACKAGE_NAME
+            )
         )
         dh = logging.StreamHandler()
         dh.setLevel(logging.DEBUG)

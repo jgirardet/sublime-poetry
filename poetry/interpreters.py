@@ -116,7 +116,7 @@ class PythonInterpreter:
 
         try:
             version_out = subprocess.check_output(
-                find_version, shell=True, executable=default_shell
+                find_version, shell=True, executable=default_shell, stderr=subprocess.STDOUT
             )
         except FileNotFoundError:
             LOG.debug("get_python_version : FileNotFoundError")

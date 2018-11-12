@@ -3,6 +3,7 @@ from collections import OrderedDict
 import logging
 import re
 import subprocess
+import platform
 import os
 
 from .consts import PACKAGE_NAME
@@ -93,8 +94,13 @@ class Pyenv:
 
 class PythonInterpreter:
     def __init__(self):
-        # if platform.system() != "Windows":
-        self.default_shell = os.environ.get("SHELL", "/bin/bash")
+        self.platform = platform.system()
+
+        if self.platform != "Windows":
+            self.default_shell = os.environ.get("SHELL", "/bin/bash")
+        else:
+            self.default_shell = None
+
         self.system_paths = self._system_paths()
         self._pyenv_path = None
 
@@ -116,7 +122,10 @@ class PythonInterpreter:
 
         try:
             version_out = subprocess.check_output(
-                find_version, shell=True, executable=default_shell, stderr=subprocess.STDOUT
+                find_version,
+                shell=True,
+                executable=default_shell,
+                stderr=subprocess.STDOUT,
             )
         except FileNotFoundError:
             LOG.debug("get_python_version : FileNotFoundError")
@@ -130,14 +139,25 @@ class PythonInterpreter:
             return version_out.decode().strip()
 
     def _system_paths(self):
-        system_paths = (
-            re.search(
-                r"(?m)^PATH=(.*)",
-                subprocess.check_output([self.default_shell, "-ic", "env"]).decode(),
+        if self.platform != "Windows":
+            system_paths = (
+                re.search(
+                    r"(?m)^PATH=(.*)",
+                    subprocess.check_output(
+                        [self.default_shell, "-ic", "env"]
+                    ).decode(),
+                )
+                .group(1)
+                .split(":")
             )
-            .group(1)
-            .split(":")
-        )
+        else:
+            system_paths = (
+                subprocess.check_output("path", shell=True)
+                .decode()
+                .strip("PATH=")
+                .strip()
+                .split(";")
+            )
         LOG.debug("PythonInterpreter system_paths: %s", system_paths)
         return system_paths
 

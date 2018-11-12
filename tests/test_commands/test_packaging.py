@@ -5,7 +5,7 @@ import sublime
 from unittest.mock import patch, PropertyMock, MagicMock
 
 
-@skip("temp")
+# @skip("temp")
 class TestPackagingCommands(PoetryDeferredTestCase):
     def setUp(self):
         super().setUp()
@@ -184,13 +184,3 @@ class TestPublishClass(TestCase):
                 self.pp.run_poetry_command.assert_called_with(
                     "publish --repository=foo --username=login --password=mdp"
                 )
-
-    # def test_noauth_repo(self):
-    #     with patch.object(poetry.poetry.Poetry, "config", new_callable=PropertyMock) as config:
-    #         with patch.object(poetry.poetry.Poetry, "auth", new_callable=PropertyMock) as auth:
-    #             auth.return_value = {"http-basic":{}, 'other_method' : {"pypi": {"password": "mdp", "username": "login"}}}
-    #             config.return_value = {'repositories': {}}
-    #             # self.pp.window.show_inpout_panel = MagicMock(return_value="login, mdp")
-    #             # self.pp.get_credential =  lambda x: ('login', 'mdp')
-    #             self.pp.run()
-    #             self.pp.run_poetry_command.assert_called_with('publish --username=login --password=mdp')

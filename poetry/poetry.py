@@ -126,7 +126,7 @@ class Poetry:
     def used_venv(self):
         self.run("debug:info")
         out = self.output
-        LOG.debug("used_venv_out : ", out)
+        LOG.debug("used_venv_out : %s", out)
         if self.platform == "windows":
             regex = rb"Virtualenv(?:\r\r\n.*)* \* (Path:.+)"
         else:

@@ -13,6 +13,7 @@ install:
     - ps: .\appveyor.ps1 "bootstrap" -verbose
     # install Package Control
     - ps: .\appveyor.ps1 "install_package_control" -verbose
+    - poetry config
 
 build: off
 

@@ -9,24 +9,24 @@ class TestInstallCommands(PoetryDeferredTestCase):
         if (self.dirpath / "poetry.lock").exists():
             (self.dirpath / "poetry.lock").unlink()
 
-    # def test_install(self):
+    def test_install(self):
 
-    #     self.window.run_command("poetry_install")
-    #     yield self.status
-    #     self.assertEqual(self.result, True)
+        self.window.run_command("poetry_install")
+        yield self.status
+        self.assertEqual(self.result, True)
 
-    # def test_install_no_dev(self):
-    #     self.window.run_command("poetry_install_no_dev")
+    def test_install_no_dev(self):
+        self.window.run_command("poetry_install_no_dev")
 
-    #     yield self.status
+        yield self.status
 
-    #     self.assertTrue((self.dirpath / "poetry.lock").exists())
-    #     self.assertEqual(self.result, True)
+        self.assertTrue((self.dirpath / "poetry.lock").exists())
+        self.assertEqual(self.result, True)
 
-    # def test_update(self):
-    #     self.window.run_command("poetry_update")
-    #     yield self.status
-    #     self.assertTrue((self.dirpath / "poetry.lock").exists())
+    def test_update(self):
+        self.window.run_command("poetry_update")
+        yield self.status
+        self.assertTrue((self.dirpath / "poetry.lock").exists())
 
     def test_install_in_venv(self):
         shutil.rmtree(str(self.venv))

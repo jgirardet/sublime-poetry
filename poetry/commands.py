@@ -178,11 +178,9 @@ class PoetryPublishCommand(PoetryCommand):
 
             self.repo = self.repos[choice]
 
-        print(self.repo)
+        LOG.debug("repos in poetry config %s", self.repo)
 
         credos = self.get_credential(self.repo)
-
-        print(credos)
 
         if not credos:
             self.window.show_input_panel(

@@ -39,6 +39,7 @@ class PoetryCommand(sublime_plugin.WindowCommand):
 
 class PoetrySetPythonInterpreterCommand(PoetryCommand):
     def run(self):
+        self.poetry = Poetry(self.window)
         sublime.set_timeout_async(self._run, 0)
 
     def _run(self):
@@ -199,17 +200,11 @@ class PoetryPublishCommand(PoetryCommand):
         self.poetry = Poetry(self.window)
         # if many repo : choose repo
         self.repos = list(self.poetry.config["repositories"].keys())
-        selected = None
         if self.repos:
             self.repos.insert(0, "pypi")
 
-            repo = None
-            selected = self.window.show_quick_panel(
+            self.window.show_quick_panel(
                 self.repos, lambda choice: self.setup_publish(choice)
             )
         else:
             self.setup_publish("pypi")
-
-        # check for credential if repo
-
-        # run command

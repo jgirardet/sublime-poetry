@@ -35,7 +35,7 @@ class TestPoetry(TestCase):
     def test_get_poetry_cmd_config(self):
         """return current poetry_binary via config option"""
 
-        self.poetry.config["poetry_binary"] = __file__
+        self.poetry.settings["poetry_binary"] = __file__
 
         self.assertEqual(self.poetry.get_poetry_cmd(), __file__)
 

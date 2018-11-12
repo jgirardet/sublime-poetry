@@ -145,6 +145,7 @@ class Poetry:
         code from sdispatcher/poetry
         """
         if self.settings["poetry_binary"]:
+            print('using poetry binary')
             poetry_bin = Path(self.settings["poetry_binary"])
 
         else:

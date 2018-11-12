@@ -157,6 +157,7 @@ class PythonInterpreter:
 
         for e in sorted(binaries):
             if re.search(r"python\d?\.?\d?$", str(e)):
+                LOG.debug('_execs tested: %s', str(e))
                 execs[str(e)] = self.get_python_version(str(e), self.default_shell)
 
         LOG.debug("PythonInterpreter exec: %s", execs)

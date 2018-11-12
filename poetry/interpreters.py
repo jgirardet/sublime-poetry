@@ -146,7 +146,7 @@ class PythonInterpreter:
         execs = {}
         for path in self.system_paths:
             # print(path)
-            if path.endswith("pyenv/bin") or path.endswith("pyenv/shims") :
+            if path.endswith("pyenv/bin") or path.endswith("pyenv/shims"):
                 self._pyenv_path = Path(path).parent
                 continue
             elif ".pyenv" in path:
@@ -157,7 +157,7 @@ class PythonInterpreter:
 
         for e in sorted(binaries):
             if re.search(r"python\d?\.?\d?$", str(e)):
-                LOG.debug('_execs tested: %s', str(e))
+                LOG.debug("_execs tested: %s", str(e))
                 execs[str(e)] = self.get_python_version(str(e), self.default_shell)
 
         LOG.debug("PythonInterpreter exec: %s", execs)
@@ -172,6 +172,8 @@ class PythonInterpreter:
         return Pyenv(self._pyenv_path)
 
     def _execs_and_pyenv(self):
+
+        LOG.debug("pyenv 32 %s", self._pyenv_path)
         if self.pyenv:
             duo = dict(self.execs)
             duo.update(self.pyenv.base_env)
@@ -180,4 +182,5 @@ class PythonInterpreter:
             return res
 
         else:
-            self.execs
+            LOG.debug("PythonInterpreter execs no pyenv %s", self.execs)
+            return tuple(self.execs.items())

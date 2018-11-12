@@ -39,6 +39,7 @@ install:
     - sh travis.sh install_package_control
 
     #create config files
+    - source $HOME/.poetry/env
     - poetry config 
 
 script:

@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import re
 import subprocess
 
@@ -7,6 +8,7 @@ import sublime
 import toml
 
 from .consts import PACKAGE_NAME
+from .compat import VENV_BIN_DIR
 from .utils import Path, startup_info
 from .utils import get_settings, find_pyproject, find_root_file, import_module_from_path
 from .interpreters import PythonInterpreter
@@ -44,6 +46,7 @@ class Venv:
 
         str(mja min micro)
         """
+        # python_exec = "python.exe" if platform.system == "Windows" else "python"
 
         if self:
             cfg = None
@@ -55,7 +58,7 @@ class Venv:
             # python 2
             else:
                 cfg = PythonInterpreter.get_python_version(
-                    str(self.path / "bin" / "python")
+                    str(self.path / VENV_BIN_DIR/ "python")
                 )
             LOG.debug(".venv python version  :%s", cfg)
             return cfg

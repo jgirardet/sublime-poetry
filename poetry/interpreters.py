@@ -114,7 +114,6 @@ class PythonInterpreter:
 
         return: str(major minor micro)
         """
-
         # formatting since print tupple is different for python2 and 3
         find_version = "{} -c \"import sys;print('%s.%s.%s' % (sys.version_info.major ,sys.version_info.minor, sys.version_info.micro))\"".format(
             python_executable

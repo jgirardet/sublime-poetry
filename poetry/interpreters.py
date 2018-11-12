@@ -119,11 +119,11 @@ class PythonInterpreter:
                 find_version, shell=True, executable=default_shell
             )
         except FileNotFoundError:
-            # LOG.debug("is_python3_executable : FileNotFoundError")
+            LOG.debug("get_python_version : FileNotFoundError")
             return False
 
         except subprocess.CalledProcessError as err:
-            # LOG.debug("is_python3_executable : CalledProcessError %s", err)
+            LOG.debug("get_python_version: CalledProcessError %s", err)
             return False
 
         else:
@@ -146,7 +146,7 @@ class PythonInterpreter:
         execs = {}
         for path in self.system_paths:
             # print(path)
-            if path.endswith(".pyenv/bin"):
+            if path.endswith("pyenv/bin") or path.endswith("pyenv/shims") :
                 self._pyenv_path = Path(path).parent
                 continue
             elif ".pyenv" in path:

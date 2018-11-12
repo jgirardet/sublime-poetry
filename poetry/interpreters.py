@@ -164,6 +164,7 @@ class PythonInterpreter:
     def _execs(self):
         binaries = set()
         execs = {}
+        glob_param = "python.exe" if self.platform == "Windows" else "python*"
         for path in self.system_paths:
             # print(path)
             if path.endswith("pyenv/bin") or path.endswith("pyenv/shims"):
@@ -173,12 +174,15 @@ class PythonInterpreter:
                 pass
             else:
                 path = Path(path)
-                binaries.update((p.resolve() for p in path.glob("python*")))
+                binaries.update((p.resolve() for p in path.glob(glob_param)))
 
         for e in sorted(binaries):
-            if re.search(r"python\d?\.?\d?$", str(e)):
-                LOG.debug("_execs tested: %s", str(e))
+            if self.platform == "Windows":
                 execs[str(e)] = self.get_python_version(str(e), self.default_shell)
+            else:
+                if re.search(r"python\d?\.?\d?$", str(e)):
+                    LOG.debug("_execs tested: %s", str(e))
+                    execs[str(e)] = self.get_python_version(str(e), self.default_shell)
 
         LOG.debug("PythonInterpreter exec: %s", execs)
         return execs

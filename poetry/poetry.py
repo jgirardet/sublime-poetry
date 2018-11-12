@@ -94,6 +94,9 @@ class Venv:
             return False
         return cls(cwd=cwd, view=view)
 
+    def __str__(self):
+        return str(self.path)
+
 
 class Poetry:
     def __init__(self, window, cwd=None):

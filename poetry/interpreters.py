@@ -118,7 +118,6 @@ class PythonInterpreter:
         find_version = "{} -c \"import sys;print('%s.%s.%s' % (sys.version_info.major ,sys.version_info.minor, sys.version_info.micro))\"".format(
             python_executable
         )
-
         try:
             version_out = subprocess.check_output(
                 find_version,

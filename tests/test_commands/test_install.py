@@ -11,6 +11,7 @@ class TestInstallCommands(PoetryDeferredTestCase):
 
     def test_install(self):
 
+      
         self.window.run_command("poetry_install")
         yield self.status
         self.assertEqual(self.result, True)
@@ -34,9 +35,9 @@ class TestInstallCommands(PoetryDeferredTestCase):
 
         com.window.show_quick_panel = lambda x, y: True
         com.run()  # do init thing
-
         com.callback(0)  # run as 0 choice is used
 
         yield self.status
-        self.assertTrue((self.dirpath / ".venv" / "bin" / "python").exists())
+
+        self.assertTrue((self.dirpath / ".venv" /poetry.compat.VENV_BIN_DIR / poetry.compat.PYTHON_EXEC).exists())
         self.assertTrue((self.dirpath / "poetry.lock").exists())

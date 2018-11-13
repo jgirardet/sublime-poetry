@@ -8,7 +8,7 @@ import sublime
 import toml
 
 from .consts import PACKAGE_NAME
-from .compat import VENV_BIN_DIR
+from .compat import VENV_BIN_DIR, PYTHON_EXEC
 from .utils import Path, startup_info
 from .utils import get_settings, find_pyproject, find_root_file, import_module_from_path
 from .interpreters import PythonInterpreter
@@ -48,7 +48,7 @@ class Venv:
         """
         # python_exec = "python.exe" if platform.system == "Windows" else "python"
 
-        if self:
+        if self.path.exists():
             cfg = None
             pyvenv = self.path / "pyvenv.cfg"
             # python 3
@@ -58,12 +58,13 @@ class Venv:
             # python 2
             else:
                 cfg = PythonInterpreter.get_python_version(
-                    str(self.path / VENV_BIN_DIR/ "python")
+                    str(self.path / VENV_BIN_DIR/ PYTHON_EXEC)
                 )
             LOG.debug(".venv python version  :%s", cfg)
             return cfg
 
-        return ""
+        else:
+            return ""
 
     @classmethod
     def create(cls, path, version, cwd, view=None):
@@ -206,15 +207,22 @@ class Poetry:
             "appdirs", str(self.poetry_root / "lib" / "poetry" / "utils" / "appdirs.py")
         )
 
-        return {
+        dirs =  {
             "cache": Path(appdirs.user_cache_dir("pypoetry")),
             "config": Path(appdirs.user_config_dir("pypoetry")),
         }
+
+        # pypoetry not alwways create config files
+        if not (dirs['config'] / "auth.toml").exists():
+            _ = subprocess.call('{} config'.format(self.cmd), shell=self.shell)
+
+        return dirs
 
     @property
     def auth(self):
         # if not self._config:
         config_dir = self.appdirs()["config"]
+
         auth = toml.loads((config_dir / "auth.toml").read_text())
 
         return auth

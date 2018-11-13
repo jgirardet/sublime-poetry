@@ -7,8 +7,10 @@ import sublime
 class TestInterpreter(PoetryDeferredTestCase):
     def test_aa_set_python_interpreter(self):
         self.window.run_command("poetry_set_python_interpreter")
-        yield 1000
+        yield 2000
+  
         project_data = self.window.project_data()
+
 
         if (
             "TRAVIS" in os.environ and os.environ["TRAVIS_OS_NAME"] == "linux"

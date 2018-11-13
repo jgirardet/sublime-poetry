@@ -8,7 +8,7 @@ import sublime
 from .poetry import Poetry, Venv
 from .compat import VENV_BIN_DIR
 from .utils import poetry_used, timed
-from .consts import PACKAGE_NAME
+from .consts import PACKAGE_NAME, POETRY_STATUS_BAR_TIMEOUT
 from .interpreters import PythonInterpreter
 from .command_runner import PoetryThread, ThreadProgress
 
@@ -51,6 +51,9 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
         project["settings"]["python_interpreter"] = str(python_interpreter)
 
         self.window.set_project_data(project)
+        view =  self.window.active_view()
+        view.set_status(PACKAGE_NAME, "python interpreter set !")
+        sublime.set_timeout(lambda: view.erase_status(PACKAGE_NAME), POETRY_STATUS_BAR_TIMEOUT)
 
 
 class PoetryInstallCommand(PoetryCommand):

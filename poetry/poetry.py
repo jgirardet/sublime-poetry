@@ -58,7 +58,7 @@ class Venv:
             # python 2
             else:
                 cfg = PythonInterpreter.get_python_version(
-                    str(self.path / VENV_BIN_DIR/ PYTHON_EXEC)
+                    str(self.path / VENV_BIN_DIR / PYTHON_EXEC)
                 )
             LOG.debug(".venv python version  :%s", cfg)
             return cfg
@@ -77,30 +77,38 @@ class Venv:
         Return: Path(new_venv)
         """
 
-        LOG.debug('creating %s', str(cwd))
+        LOG.debug("creating %s", str(cwd))
         if not isinstance(cwd, Path):
             cwd = Path(cwd)
 
         shell = True if sublime.platform() == "windows" else None
 
         module = "venv" if version.startswith("3") else "virtualenv"
-        p = subprocess.Popen(
-            [path, "-m", module, ".venv"],
-            # "{} -m {} .venv".format(path, module),
-            cwd=str(cwd),
-            stderr=subprocess.STDOUT,
-            stdout=subprocess.PIPE,
-            shell=shell,
-        )
+
         try:
-            out = p.communicate(timeout=100)
-            LOG.debug('.venv creation exited with code %s', p.returncode)
+            out = subprocess.check_output(
+                [path, "-m", module, ".venv"],
+                # "{} -m {} .venv".format(path, module),
+                cwd=str(cwd),
+                stderr=subprocess.STDOUT,
+                # stdout=subprocess.PIPE,
+                shell=shell,
+                timeout=100,
+            )
         except subprocess.TimeoutExpired as err:
-            LOG.debug(".venv creation: %s", err.output)
-            return False
-        LOG.debug('.venv creation return : %s', out.decode())
-        LOG.debug('.venv created at %s : %s', str(cwd / ".venv"),  (cwd / ".venv").exists())
-        return cls(cwd=cwd, view=view)
+            LOG.error(".venv creation: %s", err.output)
+            raise err
+
+        except subprocess.CalledProcessError as err:
+            LOG.error(".venv creation exited with code %s", p.returncode)
+            raise err
+
+        else:
+            LOG.debug(
+                ".venv created at %s : %s", str(cwd / ".venv"), (cwd / ".venv").exists()
+            )
+            return cls(cwd=cwd, view=view)
+        # LOG.debug('.venv creation return : %s', out.decode())
 
     def __str__(self):
         return str(self.path)
@@ -211,14 +219,14 @@ class Poetry:
             "appdirs", str(self.poetry_root / "lib" / "poetry" / "utils" / "appdirs.py")
         )
 
-        dirs =  {
+        dirs = {
             "cache": Path(appdirs.user_cache_dir("pypoetry")),
             "config": Path(appdirs.user_config_dir("pypoetry")),
         }
 
         # pypoetry not alwways create config files
-        if not (dirs['config'] / "auth.toml").exists():
-            _ = subprocess.call('{} config'.format(self.cmd), shell=self.shell)
+        if not (dirs["config"] / "auth.toml").exists():
+            _ = subprocess.call("{} config".format(self.cmd), shell=self.shell)
 
         return dirs
 

@@ -92,7 +92,7 @@ class Venv:
             shell=shell,
         )
         try:
-            p.wait(timeout=10)
+            p.wait(timeout=100)
         except subprocess.TimeoutExpired as err:
             LOG.debug("new_dot_venv: %s", err.output)
             return False

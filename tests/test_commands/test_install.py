@@ -29,6 +29,12 @@ class TestInstallCommands(PoetryDeferredTestCase):
         yield self.status
         self.assertTrue((self.dirpath / "poetry.lock").exists())
 
+class TestInstallInVenvCommands(PoetryDeferredTestCase):
+    def setUp(self):
+        super().setUp()
+        if (self.dirpath / "poetry.lock").exists():
+            (self.dirpath / "poetry.lock").unlink()
+
     def test_install_in_venv(self):
         shutil.rmtree(str(self.venv))
         com = poetry.commands.PoetryInstallInVenvCommand(self.window)

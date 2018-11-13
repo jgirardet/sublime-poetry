@@ -11,9 +11,11 @@ class TestInstallCommands(PoetryDeferredTestCase):
 
     def test_install(self):
 
+        self.assertTrue((self.dirpath / ".venv").exists())
         self.window.run_command("poetry_install")
         yield self.status
         self.assertEqual(self.result, True)
+        self.assertEqual(poetry.poetry.Poetry(self.window).used_venv() , self.dirpath / '.venv')
 
     def test_install_no_dev(self):
         self.window.run_command("poetry_install_no_dev")
@@ -36,7 +38,9 @@ class TestInstallCommands(PoetryDeferredTestCase):
         com.run()  # do init thing
         com.callback(0)  # run as 0 choice is used
 
-        yield self.status
+
+        yield 20000
+        # yield self.status
 
         self.assertTrue(
             (

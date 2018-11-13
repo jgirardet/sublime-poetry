@@ -77,6 +77,7 @@ class Venv:
         Return: Path(new_venv)
         """
 
+        LOG.debug('creating %s', str(cwd))
         if not isinstance(cwd, Path):
             cwd = Path(cwd)
 
@@ -92,10 +93,14 @@ class Venv:
             shell=shell,
         )
         try:
-            p.wait(timeout=100)
+            p.communicate(timeout=100)
+            LOG.debug('.venv creation exited with code %s', p.returncode)
         except subprocess.TimeoutExpired as err:
-            LOG.debug("new_dot_venv: %s", err.output)
+            LOG.debug(".venv creation: %s", err.output)
             return False
+        LOG.debug('avant')
+        LOG.debug('.venv created at %s : %s', str(cwd / ".venv"),  (cwd / ".venv").exists())
+        LOG.debug('après')
         return cls(cwd=cwd, view=view)
 
     def __str__(self):

@@ -114,13 +114,16 @@ class PoetryRemoveCommand(PoetryCommand):
 
 class PoetryInstallInVenvCommand(PoetryCommand):
     def create_and_install(self, path, version):
-        if Venv.create(path, version, self.poetry.cwd):
-            self.window.run_command("poetry_install")
+        new_venv = Venv.create(path, version, self.poetry.cwd)
+        
+        self.window.run_command("poetry_install")
 
     def callback(self, id):
         path, version = self.python_interpreter.execs_and_pyenv[id]
-        LOG.debug("using %s", path)
+        LOG.debug("using %s with version %s", path, version)
+        LOG.debug("current .venv version : %s",self.poetry.venv.version)
         if version == self.poetry.venv.version:
+            LOG.debug("version in .venv is the same as selected")
             go_on = sublime.ok_cancel_dialog(
                 ".venv is already with version {}. Continue ?".format(version)
             )
@@ -128,8 +131,12 @@ class PoetryInstallInVenvCommand(PoetryCommand):
                 LOG.debug("Install command interupted by user")
                 return
 
+        print(self.poetry.venv)
         if self.poetry.venv.exists():
+            LOG.debug('Removing old .venv')
             shutil.rmtree(str(self.poetry.venv))
+        else:
+            LOG.debug('.venv doesn not exists')
 
         sublime.set_timeout_async(lambda: self.create_and_install(path, version), 0)
 

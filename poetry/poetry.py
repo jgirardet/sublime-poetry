@@ -93,14 +93,13 @@ class Venv:
             shell=shell,
         )
         try:
-            p.communicate(timeout=100)
+            out = p.communicate(timeout=100)
             LOG.debug('.venv creation exited with code %s', p.returncode)
         except subprocess.TimeoutExpired as err:
             LOG.debug(".venv creation: %s", err.output)
             return False
-        LOG.debug('avant')
+        LOG.debug('.venv creation return : %s', out.decode())
         LOG.debug('.venv created at %s : %s', str(cwd / ".venv"),  (cwd / ".venv").exists())
-        LOG.debug('après')
         return cls(cwd=cwd, view=view)
 
     def __str__(self):

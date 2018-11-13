@@ -15,7 +15,7 @@ class TestInstallCommands(PoetryDeferredTestCase):
         self.window.run_command("poetry_install")
         yield self.status
         self.assertEqual(self.result, True)
-        self.assertEqual(poetry.poetry.Poetry(self.window).used_venv() , self.dirpath / '.venv')
+        self.assertEqual(poetry.poetry.Poetry(self.window).used_venv().resolve() , (self.dirpath / '.venv').resolve())
 
     def test_install_no_dev(self):
         self.window.run_command("poetry_install_no_dev")

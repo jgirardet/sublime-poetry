@@ -41,7 +41,7 @@ class TestInstallInVenvCommands(PoetryDeferredTestCase):
 
         com.window.show_quick_panel = lambda x, y: True
         com.run()  # do init thing
-        com.callback(0)  # run as 0 choice is used
+        com.callback(1)  # run as 0 choice is used
 
         yield 20000
         # yield self.status

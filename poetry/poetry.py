@@ -96,16 +96,16 @@ class Venv:
                 timeout=100,
             )
         except subprocess.TimeoutExpired as err:
-            LOG.error(".venv creation: %s", err.output)
+            LOG.error(".venv creation: %s", err.output.decode())
             raise err
 
         except subprocess.CalledProcessError as err:
-            LOG.error(".venv creation exited with code %s", p.returncode)
+            LOG.error(".venv creation exited with code %s", err.output.decode())
             raise err
 
         else:
             LOG.debug(
-                ".venv created at %s : %s", str(cwd / ".venv"), (cwd / ".venv").exists()
+                ".venv created at %s : %s with message %s", str(cwd / ".venv"), (cwd / ".venv").exists(), out.decode()
             )
             return cls(cwd=cwd, view=view)
         # LOG.debug('.venv creation return : %s', out.decode())

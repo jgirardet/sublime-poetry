@@ -1,8 +1,10 @@
 from fixtures import PoetryDeferredTestCase, poetry
 import shutil
 from unittest.mock import patch
+from unittest import skip
 
 
+@skip("mokm")
 class TestInstallCommands(PoetryDeferredTestCase):
     def setUp(self):
         super().setUp()
@@ -29,19 +31,48 @@ class TestInstallCommands(PoetryDeferredTestCase):
         yield self.status
         self.assertTrue((self.dirpath / "poetry.lock").exists())
 
+
 class TestInstallInVenvCommands(PoetryDeferredTestCase):
     def setUp(self):
         super().setUp()
         if (self.dirpath / "poetry.lock").exists():
             (self.dirpath / "poetry.lock").unlink()
 
-    def test_install_in_venv(self):
+    def test_install_in_venv_python3(self):
         shutil.rmtree(str(self.venv))
         com = poetry.commands.PoetryInstallInVenvCommand(self.window)
 
         com.window.show_quick_panel = lambda x, y: True
         com.run()  # do init thing
-        com.callback(1)  # run as 0 choice is used
+
+        for i, version in enumerate(com.python_interpreter.execs_and_pyenv):
+            if version[1].startswith("3"):
+                com.callback(i)  # run as 0 choice is used
+                break
+
+        yield 20000
+        # yield self.status
+
+        self.assertTrue(
+            (
+                self.dirpath
+                / ".venv"
+                / poetry.compat.VENV_BIN_DIR
+                / poetry.compat.PYTHON_EXEC
+            ).exists()
+        )
+        self.assertTrue((self.dirpath / "poetry.lock").exists())
+
+    def test_install_in_venv_python2(self):
+        shutil.rmtree(str(self.venv))
+        com = poetry.commands.PoetryInstallInVenvCommand(self.window)
+
+        com.window.show_quick_panel = lambda x, y: True
+        com.run()  # do init thing
+        for i, version in enumerate(com.python_interpreter.execs_and_pyenv):
+            if version[1].startswith("2"):
+                com.callback(i)  # run as 0 choice is used
+                break
 
         yield 20000
         # yield self.status

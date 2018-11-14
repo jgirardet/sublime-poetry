@@ -255,3 +255,8 @@ class Poetry:
         self._config = toml.loads(self.output.decode())
 
         return self._config
+
+    @property
+    def package_version(self):
+        return toml.loads(self.pyproject.read_text())['tool']['poetry']['version']
+    

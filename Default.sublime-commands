@@ -41,4 +41,9 @@
         "caption": "Poetry: Publish package",
         "command": "poetry_publish"
     },
+
+    {
+        "caption": "Poetry: Bump version",
+        "command": "poetry_version"
+    }
 ]

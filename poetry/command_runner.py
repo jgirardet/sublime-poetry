@@ -25,15 +25,14 @@ class PoetryThread(threading.Thread):
         while self.poetry.poll is None:
             time.sleep(0.5)
 
-        output = self.poetry.output
+        self.output = self.poetry.output.decode()
 
         if self.poetry.popen.returncode == 0:
-            LOG.debug("Output of command %s : %s", self.command, output.decode())
+            LOG.debug("Output of command %s : %s", self.command, self.output)
         else:
-            LOG.error("Output of command %s : %s", self.command, output.decode())
-            print(output)
+            LOG.error("Output of command %s : %s", self.command, self.output)
             panel = self.poetry.window.get_output_panel("poetry")
-            characters = "POETRY ERROR LOG\n\n" + output.decode()
+            characters = "POETRY ERROR LOG\n\n" + self.output
             panel.run_command("append", args={"characters": characters})
             self.poetry.window.run_command(
                 "show_panel", args={"panel": "output.poetry"}
@@ -50,8 +49,10 @@ class ThreadProgress:
     code modified from github.com/wbond/package_control
     """
 
-    def __init__(self, thread):
+    def __init__(self, thread, show_out=False, end_duration= POETRY_STATUS_BAR_TIMEOUT):
         self.thread = thread
+        self.show_out = show_out
+        self.end_duration = end_duration
         self.message = "Poetry " + thread.command
         self.success_message = self.message + " successful"
         self.failure_message = self.message + " fail"
@@ -113,6 +114,8 @@ class ThreadProgress:
         cleanup()
         flash_status_bar("poetry_is_orange", "hide")
         if self.thread.poetry.popen.returncode == 0:
+            if self.show_out:
+                self.success_message = self.success_message + " " + self.thread.output
             self.active_view.set_status(PACKAGE_NAME, self.success_message)
 
             flash_status_bar("poetry_is_green")
@@ -121,4 +124,4 @@ class ThreadProgress:
             self.active_view.set_status(PACKAGE_NAME, self.failure_message)
             flash_status_bar("poetry_is_red")
 
-        sublime.set_timeout(cleanup, POETRY_STATUS_BAR_TIMEOUT)
+        sublime.set_timeout(cleanup, self.end_duration)

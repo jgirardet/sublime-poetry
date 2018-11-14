@@ -21,12 +21,12 @@ class PoetryCommand(sublime_plugin.WindowCommand):
 
     is_enabled = is_active
 
-    def run_poetry_command(self, command, *args):
+    def run_poetry_command(self, command, *args, show_out=False, end_duration=POETRY_STATUS_BAR_TIMEOUT):
         if not hasattr(self, "poetry"):
             self.poetry = Poetry(self.window)
         runner = PoetryThread(command, self.poetry, *args)
         runner.start()
-        ThreadProgress(runner)
+        ThreadProgress(runner, show_out, end_duration)
 
     def run_input_command(self, caption, command, custom=""):
         if custom:
@@ -51,9 +51,11 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
         project["settings"]["python_interpreter"] = str(python_interpreter)
 
         self.window.set_project_data(project)
-        view =  self.window.active_view()
+        view = self.window.active_view()
         view.set_status(PACKAGE_NAME, "python interpreter set !")
-        sublime.set_timeout(lambda: view.erase_status(PACKAGE_NAME), POETRY_STATUS_BAR_TIMEOUT)
+        sublime.set_timeout(
+            lambda: view.erase_status(PACKAGE_NAME), POETRY_STATUS_BAR_TIMEOUT
+        )
 
 
 class PoetryInstallCommand(PoetryCommand):
@@ -115,13 +117,13 @@ class PoetryRemoveCommand(PoetryCommand):
 class PoetryInstallInVenvCommand(PoetryCommand):
     def create_and_install(self, path, version):
         new_venv = Venv.create(path, version, self.poetry.cwd)
-        
+
         self.window.run_command("poetry_install")
 
     def callback(self, id):
         path, version = self.python_interpreter.execs_and_pyenv[id]
         LOG.debug("using %s with version %s", path, version)
-        LOG.debug("current .venv version : %s",self.poetry.venv.version)
+        LOG.debug("current .venv version : %s", self.poetry.venv.version)
         if version == self.poetry.venv.version:
             LOG.debug("version in .venv is the same as selected")
             go_on = sublime.ok_cancel_dialog(
@@ -133,10 +135,10 @@ class PoetryInstallInVenvCommand(PoetryCommand):
 
         print(self.poetry.venv)
         if self.poetry.venv.exists():
-            LOG.debug('Removing old .venv')
+            LOG.debug("Removing old .venv")
             shutil.rmtree(str(self.poetry.venv))
         else:
-            LOG.debug('.venv doesn not exists')
+            LOG.debug(".venv doesn not exists")
 
         sublime.set_timeout_async(lambda: self.create_and_install(path, version), 0)
 
@@ -216,3 +218,24 @@ class PoetryPublishCommand(PoetryCommand):
             )
         else:
             self.setup_publish("pypi")
+
+
+class PoetryVersionCommand(PoetryCommand):
+    def _run_version(self, choice):
+        if choice == -1 or choice == 0:
+            LOG.debug("Bump version cancelled")
+            return
+        selected = self.actions[choice]
+        LOG.debug("Bump version {}".format(selected))
+        self.run_poetry_command("version {}".format(selected), show_out=True, end_duration=3000)
+
+    def run(self):
+        self.poetry = Poetry(self.window)
+        self.actions = "patch minor major prepatch preminor premajor prerelease".split()
+        current = "current {}".format(self.poetry.package_version)
+        self.actions.insert(0, current)
+        self.window.show_quick_panel(
+            self.actions,
+            lambda choice: self._run_version(choice),
+            sublime.MONOSPACE_FONT,
+        )

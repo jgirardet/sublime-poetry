@@ -39,7 +39,7 @@ class TestInstallInVenvCommands(PoetryDeferredTestCase):
             (self.dirpath / "poetry.lock").unlink()
 
     def test_install_in_venv_python3(self):
-        shutil.rmtree(str(self.venv))
+        shutil.rmtree(str(self.venv),  ignore_errors=True)
         com = poetry.commands.PoetryInstallInVenvCommand(self.window)
 
         com.window.show_quick_panel = lambda x, y: True
@@ -64,14 +64,14 @@ class TestInstallInVenvCommands(PoetryDeferredTestCase):
         self.assertTrue((self.dirpath / "poetry.lock").exists())
 
     def test_install_in_venv_python2(self):
-        shutil.rmtree(str(self.venv))
+        shutil.rmtree(str(self.venv),  ignore_errors=True)
         com = poetry.commands.PoetryInstallInVenvCommand(self.window)
 
         com.window.show_quick_panel = lambda x, y: True
         com.run()  # do init thing
         for i, version in enumerate(com.python_interpreter.execs_and_pyenv):
             if version[1].startswith("2"):
-                print(subprocess.check_output('{} -m pip install virtualenv --user'.format(version[0]), shell=True))
+                subprocess.check_output('{} -m pip install virtualenv --user'.format(version[0]), shell=True)
                 com.callback(i)  # run as 0 choice is used
                 break
 

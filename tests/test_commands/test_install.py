@@ -2,7 +2,7 @@ from fixtures import PoetryDeferredTestCase, poetry
 import shutil
 from unittest.mock import patch
 from unittest import skip
-
+import subprocess
 
 @skip("mokm")
 class TestInstallCommands(PoetryDeferredTestCase):
@@ -71,6 +71,7 @@ class TestInstallInVenvCommands(PoetryDeferredTestCase):
         com.run()  # do init thing
         for i, version in enumerate(com.python_interpreter.execs_and_pyenv):
             if version[1].startswith("2"):
+                print(subprocess.check_output('{} -m pip install virtualenv --user'.format(version[0]), shell=True))
                 com.callback(i)  # run as 0 choice is used
                 break
 

@@ -85,6 +85,12 @@ class Venv:
 
         module = "venv" if version.startswith("3") else "virtualenv"
 
+        # test virtualenv installed
+        if version.startswith("2"):
+            if subprocess.call([path, "-m", "virtualenv", "--version"], shell=shell):
+                LOG.error("virtualenv seems not to be installed")
+                raise
+
         try:
             out = subprocess.check_output(
                 [path, "-m", module, ".venv"],
@@ -105,7 +111,10 @@ class Venv:
 
         else:
             LOG.debug(
-                ".venv created at %s : %s with message %s", str(cwd / ".venv"), (cwd / ".venv").exists(), out.decode()
+                ".venv created at %s : %s with message %s",
+                str(cwd / ".venv"),
+                (cwd / ".venv").exists(),
+                out.decode(),
             )
             return cls(cwd=cwd, view=view)
         # LOG.debug('.venv creation return : %s', out.decode())

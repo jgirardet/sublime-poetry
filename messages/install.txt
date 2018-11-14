@@ -10,8 +10,10 @@ Installation
 Changelog
 -----------
 
-
-0.2.0 :
+0.3.0:
+	add PoetryPublishCommand
+	fix tests
+0.2.0:
 	add PoetryInstallInVenvCommand
 	add PetryBuild
 	remove toml dir

@@ -64,6 +64,11 @@ Use `Ctrl-Shift-P` (Mac: `Cmd-Shift-P`). A pyproject.toml file with a poetry sec
 * Poetry: Remove package:
     Run `poetry remove {package_name}` on current project. If it's a dev-dependencie `-D` is added to the command line.
 
+* Poetry: Build:
+    Run `poetry build` on current project.
+
+* Poetry: Publish:
+    Run `poetry build` on current project.
 
 
 

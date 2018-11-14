@@ -72,7 +72,7 @@ class TestInstallInVenvCommands3(PoetryDeferredTestCase):
         com.run()  # do init thing
         for i, version in enumerate(com.python_interpreter.execs_and_pyenv):
             if version[1].startswith("2"):
-                subprocess.check_output('{} -m pip install virtualenv --user'.format(version[0]), shell=True)
+                # subprocess.check_output('{} -m pip install virtualenv --user'.format(version[0]), shell=True)
                 com.callback(i)  # run apython 2 choice is used
                 break
 

@@ -120,12 +120,13 @@ class TestPublishClass(TestCase):
         ) as config:
             config.return_value = {"repositories": {"foo": "http://foo"}}
             self.pp.window.show_quick_panel = lambda v, w: self.pp.setup_publish(1)
+            self.pp.get_credential = lambda x: None
             self.pp.window.show_input_panel = lambda v, w, x, y, z: self.pp.run_publish(
-                "login mdp".split()
+                "logininput mdpinput".split()
             )
             self.pp.run()
             self.pp.run_poetry_command.assert_called_with(
-                "publish --repository=foo --username=login --password=mdp"
+                "publish --repository=foo --username=logininput --password=mdpinput"
             )
 
     def test_auth_no_repo(self):

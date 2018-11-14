@@ -4,7 +4,7 @@ from unittest.mock import patch
 from unittest import skip
 import subprocess
 
-@skip("mokm")
+# @skip("mokm")
 class TestInstallCommands(PoetryDeferredTestCase):
     def setUp(self):
         super().setUp()
@@ -32,7 +32,7 @@ class TestInstallCommands(PoetryDeferredTestCase):
         self.assertTrue((self.dirpath / "poetry.lock").exists())
 
 
-class TestInstallInVenvCommands(PoetryDeferredTestCase):
+class TestInstallInVenvCommands3(PoetryDeferredTestCase):
     def setUp(self):
         super().setUp()
         if (self.dirpath / "poetry.lock").exists():
@@ -47,7 +47,7 @@ class TestInstallInVenvCommands(PoetryDeferredTestCase):
 
         for i, version in enumerate(com.python_interpreter.execs_and_pyenv):
             if version[1].startswith("3"):
-                com.callback(i)  # run as 0 choice is used
+                com.callback(i)  # run a python3 choice is used
                 break
 
         yield 20000
@@ -63,6 +63,12 @@ class TestInstallInVenvCommands(PoetryDeferredTestCase):
         )
         self.assertTrue((self.dirpath / "poetry.lock").exists())
 
+class TestInstallInVenvCommands2(PoetryDeferredTestCase):
+    def setUp(self):
+        super().setUp()
+        if (self.dirpath / "poetry.lock").exists():
+            (self.dirpath / "poetry.lock").unlink()
+
     def test_install_in_venv_python2(self):
         shutil.rmtree(str(self.venv))
         com = poetry.commands.PoetryInstallInVenvCommand(self.window)
@@ -72,7 +78,7 @@ class TestInstallInVenvCommands(PoetryDeferredTestCase):
         for i, version in enumerate(com.python_interpreter.execs_and_pyenv):
             if version[1].startswith("2"):
                 subprocess.check_output('{} -m pip install virtualenv --user'.format(version[0]), shell=True)
-                com.callback(i)  # run as 0 choice is used
+                com.callback(i)  # run apython 2 choice is used
                 break
 
         yield 20000

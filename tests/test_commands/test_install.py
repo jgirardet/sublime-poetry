@@ -38,8 +38,10 @@ class TestInstallInVenvCommands3(PoetryDeferredTestCase):
         if (self.dirpath / "poetry.lock").exists():
             (self.dirpath / "poetry.lock").unlink()
 
+        if self.venv.exists():
+            shutil.rmtree(str(self.venv))
+
     def test_install_in_venv_python3(self):
-        shutil.rmtree(str(self.venv))
         com = poetry.commands.PoetryInstallInVenvCommand(self.window)
 
         com.window.show_quick_panel = lambda x, y: True
@@ -65,7 +67,7 @@ class TestInstallInVenvCommands3(PoetryDeferredTestCase):
 
 
     def test_install_in_venv_python2(self):
-        shutil.rmtree(str(self.venv))
+
         com = poetry.commands.PoetryInstallInVenvCommand(self.window)
 
         com.window.show_quick_panel = lambda x, y: True

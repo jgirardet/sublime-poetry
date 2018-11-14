@@ -254,14 +254,4 @@ class Poetry:
         self.run("config --list")
         self._config = toml.loads(self.output.decode())
 
-        # long = []
-
-        # for cle in self._config:
-        #     for sous_cle in self._config[cle]:
-        #         for ss_cle in  self._config[cle][sous_cle]:
-        #             long.append((cle, sous_cle, ss_cle))
-
-        # for file in ["auth.toml", "config.toml"]:
-        #     self._config.update(toml.loads((config_dir / file).read_text()))
-
         return self._config

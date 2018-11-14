@@ -81,5 +81,7 @@ constrant = "^2.1"'''
         )
         p.pyproject.unlink()
 
+    def test_appdirs(self):
+        self.assertTrue((self.poetry.appdirs()["config"] / "auth.toml").exists())
+        self.assertTrue((self.poetry.appdirs()["config"] / "config.toml").exists())
 
-        

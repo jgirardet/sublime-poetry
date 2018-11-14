@@ -130,7 +130,7 @@ class PythonInterpreter:
             return False
 
         except subprocess.CalledProcessError as err:
-            LOG.debug("get_python_version: CalledProcessError %s", err)
+            LOG.debug("get_python_version: CalledProcessError %s", err.output)
             return False
 
         else:

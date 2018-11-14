@@ -25,12 +25,12 @@ WARNING : THIS IS STILL AN ALPHA RELEASE
 Installation
 -------------
 
-#. Install `Poetry`_ (if you haven't already)::
+#. Install `Poetry`_ (if you haven't already):
 
-.. #. In PackageControl just find ``sublack``, and that's it !
+#. In PackageControl just find ``poetry``, and that's it !
 
 
-#. Waiting for Package Control integration :   install manually by navigating to Sublime's `Packages` folder and cloning this repository under the name `poetry`::
+#. or install manually by navigating to Sublime's `Packages` folder and cloning this repository under the name `poetry`::
 
       git clone https://github.com/jgirardet/sublack.git poetry
 

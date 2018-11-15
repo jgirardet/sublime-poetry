@@ -13,6 +13,7 @@ Changelog
 0.4.0: comming
 	add Poetry version command
 	add Poetry init command
+	add Poetry Config command
 0.3.0:
 	add PoetryPublishCommand
 	fix tests

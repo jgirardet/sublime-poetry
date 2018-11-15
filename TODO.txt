@@ -5,7 +5,8 @@ command to add:
 
 Needed
 ------
-config : enable/disable options showed
+config : add auth
+install good python version
 
 after
 ------

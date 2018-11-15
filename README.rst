@@ -76,6 +76,9 @@ Use `Ctrl-Shift-P` (Mac: `Cmd-Shift-P`). A pyproject.toml file with a poetry sec
 * Poetry: Init:
     run `poetry init -n`, to create new pyproject.toml file.
 
+*Poetry: Config:
+    Manage poetry configuration and repositories
+
 
 
 Settings

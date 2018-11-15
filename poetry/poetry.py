@@ -261,7 +261,6 @@ class Poetry:
 
     @property
     def config(self):
-        # if not self._config:
         self.run("config --list")
         self._config = toml.loads(self.output.decode())
 

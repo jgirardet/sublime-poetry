@@ -1,14 +1,31 @@
 from fixtures import poetry, PoetryDeferredTestCase
 import os
-from pathlib import Path
+
+# from pathlib import Path
 from unittest.mock import patch, PropertyMock, MagicMock
+import tempfile
+
+Path = poetry.utils.Path
+import toml
 
 
 class TestConfig(PoetryDeferredTestCase):
     def setUp(self):
         super().setUp()
         self.pc = poetry.commands.PoetryConfigCommand(self.window)
-        self.pc.run_poetry_command = MagicMock()
+
+        # backup config file
+        temp_bak = tempfile.NamedTemporaryFile(delete=False)
+        temp_bak.close()
+        self.config_bak = poetry.utils.Path(temp_bak.name)
+        self.po = poetry.poetry.Poetry(self.window)
+        self.config_file = Path(self.po.appdirs()["config"], "config.toml")
+        self.config_bak.write_text(self.config_file.read_text())
+
+    def tearDown(self):
+        # restore config files
+        self.config_file.write_text(self.config_bak.read_text())
+        self.config_bak.unlink()
 
     # def test_auth_repo_pypy_selected(self):
     # with patch.object(
@@ -29,56 +46,92 @@ class TestConfig(PoetryDeferredTestCase):
     #             "publish --username=login --password=mdp"
     #         )
 
-    @patch.object(
-        poetry.poetry.Poetry,
-        "config",
-        new_callable=PropertyMock,
-        return_value={"settings": {"foo": "bar"}, "repositories": {}},
-    )
-    @patch.object(poetry.poetry.sublime, "yes_no_cancel_dialog", return_value=1)
-    def test_unset_text(self, config, yes_no):
-        self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(0)
-        self.pc.run()
-        self.pc.run_poetry_command.assert_called_with("config settings.foo --unset")
+    def choose(self, key):
+        """Select good key for tests"""
+        for i, c in enumerate(self.pc.fconfig_str):
+            if key in c[0]:
+                return i
 
-    @patch.object(
-        poetry.poetry.Poetry,
-        "config",
-        new_callable=PropertyMock,
-        return_value={"settings": {"foo": "bar"}, "repositories": {}},
-    )
-    @patch.object(poetry.poetry.sublime, "yes_no_cancel_dialog", return_value=2)
-    def test_modif_text(self, config, yes_no):
-        self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(0)
-        # self.pc.window.show_input_panel = lambda v, w, x, y, z:  self.pc.run_poetry_command(y, "new_bar")
+    def test_unset_text(self):
+        with patch.object(
+            poetry.commands.sublime, "yes_no_cancel_dialog", return_value=1
+        ) as yes_no:
+            file = toml.loads(self.config_file.read_text())
+            file = {"settings": {"virtualenvs": {"path": "nothing"}}}
+            self.config_file.write_text(toml.dumps(file))
+
+            self.assertEqual(
+                self.po.config["settings"]["virtualenvs"]["path"], "nothing"
+            )
+            # select the good one
+
+            self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(
+                self.choose("path")
+            )
+            self.pc.run()
+            yield self.status
+            self.assertEqual(
+                self.po.config["settings"]["virtualenvs"]["path"],
+                "/home/jimmy/.cache/pypoetry/virtualenvs",
+            )
+
+    def test_modif_text(self):
+        with patch.object(
+            poetry.commands.sublime, "yes_no_cancel_dialog", return_value=2
+        ) as yes_no:
+            file = toml.loads(self.config_file.read_text())
+            file = {"settings": {"virtualenvs": {"path": "nothing"}}}
+            self.config_file.write_text(toml.dumps(file))
+            self.assertEqual(
+                self.po.config["settings"]["virtualenvs"]["path"], "nothing"
+            )
+
+            self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(
+                self.choose("path")
+            )
+            self.pc.run_input_command = lambda x, y, w: self.pc.run_poetry_command(
+                y, "new_bar"
+            )
+            self.pc.run()
+            yield self.status
+            self.assertEqual(
+                self.po.config["settings"]["virtualenvs"]["path"], "new_bar"
+            )
+
+    def test_toggle_true(self):
+        file = toml.loads(self.config_file.read_text())
+        file = {"settings": {"virtualenvs": {"create": True}}}
+        self.config_file.write_text(toml.dumps(file))
+        self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(
+            self.choose("create")
+        )
+        self.assertEqual(self.po.config["settings"]["virtualenvs"]["create"], True)
+        self.pc.run()
+        yield self.status
+        self.assertEqual(self.po.config["settings"]["virtualenvs"]["create"], False)
+
+    def test_toggle_false(self):
+        file = toml.loads(self.config_file.read_text())
+        file = {"settings": {"virtualenvs": {"create": False}}}
+        self.config_file.write_text(toml.dumps(file))
+
+        self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(
+            self.choose("create")
+        )
+        self.assertEqual(self.po.config["settings"]["virtualenvs"]["create"], False)
+        self.pc.run()
+        yield self.status
+        self.assertEqual(self.po.config["settings"]["virtualenvs"]["create"], True)
+
+    def test_add_repo(self):
+        self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(
+            self.choose("Add a new repo")
+        )
         self.pc.run_input_command = lambda x, y, w: self.pc.run_poetry_command(
-            y, "new_bar"
+            y, "repos.newone http://newone"
         )
         self.pc.run()
-        self.pc.run_poetry_command.assert_called_with("config settings.foo", "new_bar")
-
-    @patch.object(
-        poetry.poetry.Poetry,
-        "config",
-        new_callable=PropertyMock,
-        return_value={"settings": {"foo": True}, "repositories": {}},
-    )
-    def test_toggle_true(self, config):
-        self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(0)
-        # self.pc.window.show_input_panel = lambda v, w, x, y, z:  self.pc.run_input_command.to_run('new_bar')
-        # self.pc.run_input_command = lambda x, y, w: self.pc.run_poetry_command(y, "new_bar")
-        self.pc.run()
-        self.pc.run_poetry_command.assert_called_with("config settings.foo false")
-
-    @patch.object(
-        poetry.poetry.Poetry,
-        "config",
-        new_callable=PropertyMock,
-        return_value={"settings": {"foo": False}, "repositories": {}},
-    )
-    def test_toggle_false(self, config):
-        self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(0)
-        # self.pc.window.show_input_panel = lambda v, w, x, y, z:  self.pc.run_input_command.to_run('new_bar')
-        # self.pc.run_input_command = lambda x, y, w: self.pc.run_poetry_command(y, "new_bar")
-        self.pc.run()
-        self.pc.run_poetry_command.assert_called_with("config settings.foo true")
+        yield self.status
+        self.assertEqual(
+            self.po.config["repositories"]["newone"]["url"], "http://newone"
+        )

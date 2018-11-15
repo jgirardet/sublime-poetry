@@ -281,9 +281,14 @@ class PoetryConfigCommand(PoetryCommand):
         if choice == -1:
             return
         key, res = self.fconfig_type[choice]
+        LOG.debug("key: %s   res: %s", key, res)
+
+        if res == "+":
+            self.run_input_command("New repository : repo.name url", "config", "repo.")
+            self.run_after_command("poetry_config", self.CB_SLEEP)
 
         # for toggle boolean
-        if isinstance(res, bool):
+        elif isinstance(res, bool):
             res = not res
             LOG.debug("{}update of %s cancelled", key)
             self.run_poetry_command("config {} {}".format(key, str(res).lower()))
@@ -315,11 +320,17 @@ class PoetryConfigCommand(PoetryCommand):
         self.view = self.window.active_view()
 
         config = self.poetry.config
-        repos = config.pop("repositories")
 
         # quick_panel anly accept list of string and to keep boolean type
-        self.fconfig_str = [[x, str(y)] for x, y in flatten_dict(config).items()]
-        self.fconfig_type = [[x, y] for x, y in flatten_dict(config).items()]
+        self.fconfig_str = sorted(
+            [[x, str(y)] for x, y in flatten_dict(config).items()]
+        )
+        self.fconfig_type = sorted([[x, y] for x, y in flatten_dict(config).items()])
+
+        for l in [self.fconfig_str, self.fconfig_type]:
+            l.append(("Add a new repository", "+"))
+        # repos
+        # self.repos = [[x, y] for x, y in flatten_dict(config).items()]
 
         self.window.show_quick_panel(
             self.fconfig_str,

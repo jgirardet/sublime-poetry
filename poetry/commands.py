@@ -21,7 +21,9 @@ class PoetryCommand(sublime_plugin.WindowCommand):
 
     is_enabled = is_active
 
-    def run_poetry_command(self, command, *args, show_out=False, end_duration=POETRY_STATUS_BAR_TIMEOUT):
+    def run_poetry_command(
+        self, command, *args, show_out=False, end_duration=POETRY_STATUS_BAR_TIMEOUT
+    ):
         if not hasattr(self, "poetry"):
             self.poetry = Poetry(self.window)
         runner = PoetryThread(command, self.poetry, *args)
@@ -227,7 +229,9 @@ class PoetryVersionCommand(PoetryCommand):
             return
         selected = self.actions[choice]
         LOG.debug("Bump version {}".format(selected))
-        self.run_poetry_command("version {}".format(selected), show_out=True, end_duration=3000)
+        self.run_poetry_command(
+            "version {}".format(selected), show_out=True, end_duration=3000
+        )
 
     def run(self):
         self.poetry = Poetry(self.window)
@@ -239,3 +243,11 @@ class PoetryVersionCommand(PoetryCommand):
             lambda choice: self._run_version(choice),
             sublime.MONOSPACE_FONT,
         )
+
+
+class PoetryInitCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        poetry = Poetry(self.window)
+        runner = PoetryThread("init -n", poetry)
+        runner.start()
+        ThreadProgress(runner)

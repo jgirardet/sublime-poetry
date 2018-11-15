@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, PropertyMock
 from fixtures import poetry, create_fake_project
 import subprocess
 import sublime
@@ -40,16 +40,21 @@ class TestPoetry(TestCase):
         self.assertEqual(self.poetry.get_poetry_cmd(), __file__)
 
     def test_used_venv(self):
-        directory, dirpath, pyproject, venv, project = create_fake_project(venv=True)
-        self.poetry.pyproject = pyproject
-        if (
-            "TRAVIS" in os.environ and os.environ["TRAVIS_OS_NAME"] == "linux"
-        ):  # because poetry ignore .venv ifVIRTUAL_ENV set
-            new_venv = Path(os.environ["VIRTUAL_ENV"])
-        else:
-            new_venv = venv
+        with patch.object(
+            poetry.poetry.Poetry, "pyproject", new_callable=PropertyMock
+        ) as pp:
+            directory, dirpath, pyproject, venv, project = create_fake_project(
+                venv=True
+            )
+            pp.return_value = pyproject
+            if (
+                "TRAVIS" in os.environ and os.environ["TRAVIS_OS_NAME"] == "linux"
+            ):  # because poetry ignore .venv ifVIRTUAL_ENV set
+                new_venv = Path(os.environ["VIRTUAL_ENV"])
+            else:
+                new_venv = venv
 
-        self.assertEqual(self.poetry.used_venv().resolve(), new_venv.resolve())
+            self.assertEqual(self.poetry.used_venv().resolve(), new_venv.resolve())
 
     def test_output(self):
         self.poetry.popen = MagicMock()
@@ -69,19 +74,22 @@ all = "*"
 constrant = "^2.1"'''
         file.write_text(tomlfile)
 
-        p = Poetry(self.window)
-        p.pyproject = file
+        with patch.object(
+            poetry.poetry.Poetry, "pyproject", new_callable=PropertyMock
+        ) as pp:
 
-        self.assertEqual(
-            p.packages,
-            (
-                [("all", "*"), ("constrant", "^2.1"), ("python", "*")],
-                [("all", "*"), ("constrant", "^2.1")],
-            ),
-        )
-        p.pyproject.unlink()
+            p = Poetry(self.window)
+            pp.return_value = file
+
+            self.assertEqual(
+                p.packages,
+                (
+                    [("all", "*"), ("constrant", "^2.1"), ("python", "*")],
+                    [("all", "*"), ("constrant", "^2.1")],
+                ),
+            )
+            p.pyproject.unlink()
 
     def test_appdirs(self):
         self.assertTrue((self.poetry.appdirs()["config"] / "auth.toml").exists())
         self.assertTrue((self.poetry.appdirs()["config"] / "config.toml").exists())
-

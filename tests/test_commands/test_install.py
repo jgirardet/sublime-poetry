@@ -31,13 +31,11 @@ class TestInstallCommands(PoetryDeferredTestCase):
         yield self.status
         self.assertTrue((self.dirpath / "poetry.lock").exists())
 
-
-
     def test_install_in_venv_python3(self):
 
         if self.venv.exists():
             shutil.rmtree(str(self.venv))
-            
+
         com = poetry.commands.PoetryInstallInVenvCommand(self.window)
 
         com.window.show_quick_panel = lambda x, y: True
@@ -48,8 +46,12 @@ class TestInstallCommands(PoetryDeferredTestCase):
                 com.callback(i)  # run a python3 choice is used
                 break
 
-        yield 20000
-        # yield self.status
+        import os
+
+        if os.environ.get("CI", False):
+            yield 20000
+        else:
+            yield self.status
 
         self.assertTrue(
             (
@@ -60,7 +62,6 @@ class TestInstallCommands(PoetryDeferredTestCase):
             ).exists()
         )
         self.assertTrue((self.dirpath / "poetry.lock").exists())
-
 
     # def test_install_in_venv_python2(self):
 

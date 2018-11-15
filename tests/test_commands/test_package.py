@@ -3,6 +3,8 @@ from fixtures import PoetryDeferredTestCase, poetry
 
 class TestPackageCommands(PoetryDeferredTestCase):
     pass
+
+
 #     def test_a_add(self):
 
 #         self.window.run_command("poetry_add", args={"custom": "toml"})
@@ -34,25 +36,25 @@ class TestVersionCommands(PoetryDeferredTestCase):
         self.pv = poetry.commands.PoetryVersionCommand(self.window)
 
     def test_a_patch(self):
-        self.pv.window.show_quick_panel  = lambda x,y,z: self.pv._run_version(1)
+        self.pv.window.show_quick_panel = lambda x, y, z: self.pv._run_version(1)
         self.pv.run()
         yield self.status
-        self.assertEqual('0.1.1', self.pv.poetry.package_version)
+        self.assertEqual("0.1.1", self.pv.poetry.package_version)
 
     def test_b_minor(self):
-        self.pv.window.show_quick_panel  = lambda x,y,z: self.pv._run_version(2)
+        self.pv.window.show_quick_panel = lambda x, y, z: self.pv._run_version(2)
         self.pv.run()
         yield self.status
-        self.assertEqual('0.2.0', self.pv.poetry.package_version)
+        self.assertEqual("0.2.0", self.pv.poetry.package_version)
 
     def test_c_cancel(self):
-        self.pv.window.show_quick_panel  = lambda x,y,z: self.pv._run_version(-1)
+        self.pv.window.show_quick_panel = lambda x, y, z: self.pv._run_version(-1)
         self.pv.run()
         yield 1000
-        self.assertEqual('0.2.0', self.pv.poetry.package_version)
+        self.assertEqual("0.2.0", self.pv.poetry.package_version)
 
     def test_d_current(self):
-        self.pv.window.show_quick_panel  = lambda x,y,z: self.pv._run_version(-0)
+        self.pv.window.show_quick_panel = lambda x, y, z: self.pv._run_version(-0)
         self.pv.run()
         yield 1000
-        self.assertEqual('0.2.0', self.pv.poetry.package_version)
+        self.assertEqual("0.2.0", self.pv.poetry.package_version)

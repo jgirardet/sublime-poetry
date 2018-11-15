@@ -49,7 +49,7 @@ class ThreadProgress:
     code modified from github.com/wbond/package_control
     """
 
-    def __init__(self, thread, show_out=False, end_duration= POETRY_STATUS_BAR_TIMEOUT):
+    def __init__(self, thread, show_out=False, end_duration=POETRY_STATUS_BAR_TIMEOUT):
         self.thread = thread
         self.show_out = show_out
         self.end_duration = end_duration

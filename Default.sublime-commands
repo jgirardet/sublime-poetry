@@ -1,49 +1,50 @@
 [
-    {
-        "caption": "Poetry: Set python interpreter",
-        "command": "poetry_set_python_interpreter"
-    },
-    {
-        "caption": "Poetry: Install",
-        "command": "poetry_install"
-    },
-    {
-        "caption": "Poetry: Install --no-dev",
-        "command": "poetry_install_no_dev"
-    },
-    {
-        "caption": "Poetry: Install in Selected Venv",
-        "command": "poetry_install_in_venv"
-    },
-    {
-        "caption": "Poetry: Update",
-        "command": "poetry_update"
-    },
-
-    {
-        "caption": "Poetry: Add a package",
-        "command": "poetry_add"
-    },
-    {
-        "caption": "Poetry: Add dev package",
-        "command": "poetry_add_dev"
-    },
-    {
-        "caption": "Poetry: Remove package",
-        "command": "poetry_remove"
-    },
-    {
-        "caption": "Poetry: Build package",
-        "command": "poetry_build"
-    },
-
-    {
-        "caption": "Poetry: Publish package",
-        "command": "poetry_publish"
-    },
-
-    {
-        "caption": "Poetry: Bump version",
-        "command": "poetry_version"
-    }
+  {
+    "caption": "Poetry: Set python interpreter",
+    "command": "poetry_set_python_interpreter"
+  },
+  {
+    "caption": "Poetry: Install",
+    "command": "poetry_install"
+  },
+  {
+    "caption": "Poetry: Install --no-dev",
+    "command": "poetry_install_no_dev"
+  },
+  {
+    "caption": "Poetry: Install in Selected Venv",
+    "command": "poetry_install_in_venv"
+  },
+  {
+    "caption": "Poetry: Update",
+    "command": "poetry_update"
+  },
+  {
+    "caption": "Poetry: Add a package",
+    "command": "poetry_add"
+  },
+  {
+    "caption": "Poetry: Add dev package",
+    "command": "poetry_add_dev"
+  },
+  {
+    "caption": "Poetry: Remove package",
+    "command": "poetry_remove"
+  },
+  {
+    "caption": "Poetry: Build package",
+    "command": "poetry_build"
+  },
+  {
+    "caption": "Poetry: Publish package",
+    "command": "poetry_publish"
+  },
+  {
+    "caption": "Poetry: Bump version",
+    "command": "poetry_version"
+  },
+  {
+    "caption": "Poetry: Init a new project",
+    "command": "poetry_init"
+  }
 ]

@@ -2,15 +2,15 @@ from fixtures import poetry, PoetryDeferredTestCase
 import os
 from pathlib import Path
 import sublime
+import tempfile
 
 
 class TestInterpreter(PoetryDeferredTestCase):
     def test_aa_set_python_interpreter(self):
         self.window.run_command("poetry_set_python_interpreter")
         yield 2000
-  
-        project_data = self.window.project_data()
 
+        project_data = self.window.project_data()
 
         if (
             "TRAVIS" in os.environ and os.environ["TRAVIS_OS_NAME"] == "linux"
@@ -33,3 +33,12 @@ class TestInterpreter(PoetryDeferredTestCase):
                 "folders": [{"path": self.dir.name}],
             },
         )
+
+
+class TestInit(PoetryDeferredTestCase):
+    def test_init(self):
+        self.pyproject.unlink()
+        self.assertFalse(self.pyproject.exists())
+        self.window.run_command("poetry_init")
+        yield self.status
+        self.assertTrue(self.pyproject.exists())

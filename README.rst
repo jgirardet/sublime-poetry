@@ -70,6 +70,12 @@ Use `Ctrl-Shift-P` (Mac: `Cmd-Shift-P`). A pyproject.toml file with a poetry sec
 * Poetry: Publish:
     Run `poetry build` on current project.
 
+* Poetry: Bump Version:
+    Show current version and run `poetry version` on current project and let you choose between : patch minor major prepatch preminor premajor prerelease.
+
+* Poetry: Init:
+    run `poetry init -n`, to create new pyproject.toml file.
+
 
 
 Settings

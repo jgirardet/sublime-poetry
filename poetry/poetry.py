@@ -129,7 +129,7 @@ class Poetry:
         self.view = window.active_view()
         self.settings = get_settings(self.view)
 
-        self.pyproject = find_pyproject(view=self.view)
+        self._pyproject = None
         self._cwd = cwd
 
         self.cmd = self.get_poetry_cmd()
@@ -138,6 +138,13 @@ class Poetry:
 
         self.platform = sublime.platform()
         self.shell = True if self.platform == "windows" else None
+
+    @property
+    def pyproject(self):
+        if self._pyproject:
+            return self.pyproject
+        else:
+            return find_pyproject(view=self.view)
 
     @property
     def venv(self):
@@ -149,7 +156,11 @@ class Poetry:
     def cwd(self):
         if self._cwd:
             return Path(self._cwd)
-        return self.pyproject.parent
+        elif self.pyproject:
+            self._cwd = self.pyproject.parent
+        else:
+            self._cwd = Path(self.window.folders()[0])
+        return self._cwd
 
     def used_venv(self):
         self.run("debug:info")
@@ -195,7 +206,7 @@ class Poetry:
         """run a poetry command in current directory"""
         cmd = command.split()
         cmd.insert(0, self.cmd)
-        LOG.debug("Poetry::run : command = %s", cmd)
+        LOG.debug("Poetry::run : command = %s in directory %s", cmd, self.cwd)
         self.popen = subprocess.Popen(
             cmd,
             cwd=str(self.cwd),
@@ -258,5 +269,4 @@ class Poetry:
 
     @property
     def package_version(self):
-        return toml.loads(self.pyproject.read_text())['tool']['poetry']['version']
-    
+        return toml.loads(self.pyproject.read_text())["tool"]["poetry"]["version"]

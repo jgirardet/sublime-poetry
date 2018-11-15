@@ -6,7 +6,6 @@ command to add:
 Needed
 ------
 config : enable/disable options showed
-init
 
 after
 ------
@@ -23,3 +22,4 @@ done:
 build
 publish
 version
+init

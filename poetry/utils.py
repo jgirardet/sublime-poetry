@@ -176,3 +176,15 @@ def import_module_from_path(name: str, path: str):
     module = loader.load_module()
     # spec.loader.exec_module(module)
     return module
+
+
+def flatten_dict(d):
+    def items():
+        for key, value in d.items():
+            if isinstance(value, dict):
+                for subkey, subvalue in flatten_dict(value).items():
+                    yield key + "." + subkey, subvalue
+            else:
+                yield key, value
+
+    return dict(items())

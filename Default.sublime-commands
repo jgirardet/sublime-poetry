@@ -46,5 +46,9 @@
   {
     "caption": "Poetry: Init a new project",
     "command": "poetry_init"
+  },
+  {
+    "caption": "Poetry: Configure",
+    "command": "poetry_config"
   }
 ]

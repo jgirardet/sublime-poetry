@@ -1,13 +1,14 @@
 from collections import defaultdict
 import logging
 import shutil
+import time
 
 import sublime_plugin
 import sublime
 
 from .poetry import Poetry, Venv
 from .compat import VENV_BIN_DIR
-from .utils import poetry_used, timed
+from .utils import poetry_used, timed, flatten_dict
 from .consts import PACKAGE_NAME, POETRY_STATUS_BAR_TIMEOUT
 from .interpreters import PythonInterpreter
 from .command_runner import PoetryThread, ThreadProgress
@@ -30,12 +31,15 @@ class PoetryCommand(sublime_plugin.WindowCommand):
         runner.start()
         ThreadProgress(runner, show_out, end_duration)
 
-    def run_input_command(self, caption, command, custom=""):
+    def run_input_command(self, caption, command, initial="", custom=""):
+        def to_run(res):
+            self.run_poetry_command(command, res)
+
         if custom:
             self.run_poetry_command(command, custom)
         else:
             self.window.show_input_panel(
-                caption, "", lambda x: self.run_poetry_command(command, x), None, None
+                caption, initial, lambda x: to_run(x), None, None
             )
 
 
@@ -251,3 +255,75 @@ class PoetryInitCommand(sublime_plugin.WindowCommand):
         runner = PoetryThread("init -n", poetry)
         runner.start()
         ThreadProgress(runner)
+
+
+class PoetryConfigCommand(PoetryCommand):
+
+    CB_SLEEP = 50
+
+    def run_after_command(self, command, sleep):
+        """run a window command checking after ThreadProgress end"""
+
+        def reloader():
+            sublime.set_timeout_async(lambda: checker(command, sleep), sleep)
+
+        def checker(command, sleep):
+            if "succes" in self.view.get_status(PACKAGE_NAME):
+                sublime.set_timeout_async(lambda: self.window.run_command(command), 0)
+                return
+            if "fail" in self.view.get_status(PACKAGE_NAME):
+                return
+            reloader()
+
+        reloader()
+
+    def dispatch(self, choice):
+        if choice == -1:
+            return
+        key, res = self.fconfig_type[choice]
+
+        # for toggle boolean
+        if isinstance(res, bool):
+            res = not res
+            LOG.debug("{}update of %s cancelled", key)
+            self.run_poetry_command("config {} {}".format(key, str(res).lower()))
+
+            self.run_after_command("poetry_config", self.CB_SLEEP)
+
+        # unset or modify string
+        elif isinstance(res, str):
+            choice = sublime.yes_no_cancel_dialog(key, "Unset", "Modify")
+            if choice == 0:
+                LOG.debug("update of %s cancelled", key)
+                return
+
+            if choice == 2:
+                LOG.debug("updating %s", key)
+                self.run_input_command(key, "config {}".format(key), res),
+
+            elif choice == 1:
+                LOG.debug("unsetting %s", key)
+                self.run_poetry_command("config {} --unset".format(key))
+
+            self.run_after_command("poetry_config", self.CB_SLEEP)
+
+        else:
+            LOG.error("unkwon")
+
+    def run(self):
+        self.poetry = Poetry(self.window)
+        self.view = self.window.active_view()
+
+        config = self.poetry.config
+        repos = config.pop("repositories")
+
+        # quick_panel anly accept list of string and to keep boolean type
+        self.fconfig_str = [[x, str(y)] for x, y in flatten_dict(config).items()]
+        self.fconfig_type = [[x, y] for x, y in flatten_dict(config).items()]
+
+        self.window.show_quick_panel(
+            self.fconfig_str,
+            lambda choice: self.dispatch(choice),
+            sublime.MONOSPACE_FONT,
+            sublime.KEEP_OPEN_ON_FOCUS_LOST,
+        )

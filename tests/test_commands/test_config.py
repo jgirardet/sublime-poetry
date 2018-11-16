@@ -72,7 +72,7 @@ class TestConfig(PoetryDeferredTestCase):
             yield self.status
             self.assertEqual(
                 self.po.config["settings"]["virtualenvs"]["path"],
-                str(Path(self.po.appdirs()['cache'], "virtualenvs").resolve())
+                str(Path(self.po.appdirs()['cache'], "virtualenvs"))
             )
 
     def test_modif_text(self):

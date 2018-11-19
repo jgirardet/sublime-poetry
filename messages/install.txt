@@ -10,7 +10,7 @@ Installation
 Changelog
 -----------
 
-0.4.0: comming
+0.4.0:
 	add Poetry version command
 	add Poetry init command
 	add Poetry Config command

@@ -277,6 +277,50 @@ class PoetryConfigCommand(PoetryCommand):
 
         reloader()
 
+    @staticmethod
+    def do_repo_credential_list(repos):
+        new_repos =  [
+            [k, " ".join((v.get("username", ""), v.get("password", ""))).strip()]
+            for k, v in repos.items()
+        ]
+        print(new_repos)
+        if 'pypi' not in repos:
+            new_repos.insert(0, ['pypi', ""])
+        return new_repos
+
+    def configure_credentials(self):
+        def callback(choice, repo_list):
+            def to_run(x):
+                cmd = "config http-basic.{}".format(repo_list[choice][0])
+                if not x:
+                    self.run_poetry_command(cmd, "--unset")
+
+                else:
+                    self.run_poetry_command(cmd, x)
+
+            if choice == -1:
+                LOG.debug('configure credentials cancelled')
+                return
+
+            self.window.show_input_panel(
+                "username password",
+                "{}".format(repo_list[choice][1]),
+                lambda x: to_run(x),
+                None,
+                None,
+            )
+
+        repos = dict(self.base_config["repositories"])
+        repos.update(self.poetry.auth["http-basic"])
+        repo_list = self.do_repo_credential_list(repos)
+
+        self.window.show_quick_panel(
+            repo_list,
+            lambda choice: callback(choice, repo_list),
+            sublime.MONOSPACE_FONT,
+            # sublime.KEEP_OPEN_ON_FOCUS_LOST,
+        )
+
     def dispatch(self, choice):
         if choice == -1:
             return
@@ -285,7 +329,9 @@ class PoetryConfigCommand(PoetryCommand):
 
         if res == "+":
             self.run_input_command("New repository : repo.name url", "config", "repo.")
-            self.run_after_command("poetry_config", self.CB_SLEEP)
+
+        elif res == "?":
+            self.configure_credentials()
 
         # for toggle boolean
         elif isinstance(res, bool):
@@ -293,7 +339,6 @@ class PoetryConfigCommand(PoetryCommand):
             LOG.debug("{}update of %s cancelled", key)
             self.run_poetry_command("config {} {}".format(key, str(res).lower()))
 
-            self.run_after_command("poetry_config", self.CB_SLEEP)
 
         # unset or modify string
         elif isinstance(res, str):
@@ -310,25 +355,30 @@ class PoetryConfigCommand(PoetryCommand):
                 LOG.debug("unsetting %s", key)
                 self.run_poetry_command("config {} --unset".format(key))
 
-            self.run_after_command("poetry_config", self.CB_SLEEP)
 
         else:
             LOG.error("unkwon")
+
+        
+        self.run_after_command("poetry_config", self.CB_SLEEP)
 
     def run(self):
         self.poetry = Poetry(self.window)
         self.view = self.window.active_view()
 
-        config = self.poetry.config
+        self.base_config = self.poetry.config
 
         # quick_panel anly accept list of string and to keep boolean type
         self.fconfig_str = sorted(
-            [[x, str(y)] for x, y in flatten_dict(config).items()]
+            [[x, str(y)] for x, y in flatten_dict(self.base_config).items()]
         )
-        self.fconfig_type = sorted([[x, y] for x, y in flatten_dict(config).items()])
+        self.fconfig_type = sorted(
+            [[x, y] for x, y in flatten_dict(self.base_config).items()]
+        )
 
         for l in [self.fconfig_str, self.fconfig_type]:
             l.append(("Add a new repository", "+"))
+            l.append(("Configure credentials", "?"))
         # repos
         # self.repos = [[x, y] for x, y in flatten_dict(config).items()]
 

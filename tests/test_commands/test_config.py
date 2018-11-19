@@ -17,15 +17,22 @@ class TestConfig(PoetryDeferredTestCase):
         # backup config file
         temp_bak = tempfile.NamedTemporaryFile(delete=False)
         temp_bak.close()
+        temp_bak_auth = tempfile.NamedTemporaryFile(delete=False)
+        temp_bak_auth.close()
         self.config_bak = poetry.utils.Path(temp_bak.name)
+        self.auth_bak = poetry.utils.Path(temp_bak_auth.name)
         self.po = poetry.poetry.Poetry(self.window)
         self.config_file = Path(self.po.appdirs()["config"], "config.toml")
+        self.auth_file = Path(self.po.appdirs()["config"], "auth.toml")
         self.config_bak.write_text(self.config_file.read_text())
+        self.auth_bak.write_text(self.auth_file.read_text())
 
     def tearDown(self):
         # restore config files
         self.config_file.write_text(self.config_bak.read_text())
         self.config_bak.unlink()
+        self.auth_file.write_text(self.auth_bak.read_text())
+        self.auth_bak.unlink()
 
     # def test_auth_repo_pypy_selected(self):
     # with patch.object(
@@ -135,3 +142,22 @@ class TestConfig(PoetryDeferredTestCase):
         self.assertEqual(
             self.po.config["repositories"]["newone"]["url"], "http://newone"
         )
+
+    def test_modif_credential(self):
+        self.pc.configure_credentials = MagicMock()
+        self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(
+            self.choose("Configure credentials")
+        )
+
+        self.pc.configure_credentials.assert_called_with(None)
+
+
+
+        # self.pc.run_input_command = lambda x, y, w: self.pc.run_poetry_command(
+        #     y, "repos.newone http://newone"
+        # )
+        # self.pc.run()
+        # yield self.status
+        # self.assertEqual(
+        #     self.po.config["repositories"]["newone"]["url"], "http://newone"
+        # )

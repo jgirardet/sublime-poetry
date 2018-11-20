@@ -318,6 +318,7 @@ class PoetryConfigCommand(PoetryCommand):
         key, res = self.fconfig_type[choice]
         LOG.debug("key: %s   res: %s", key, res)
 
+        print("ici")
         if res == "+":
             self.run_input_command("New repository : repo.name url", "config", "repo.")
 

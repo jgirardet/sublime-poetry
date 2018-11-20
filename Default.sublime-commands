@@ -50,5 +50,9 @@
   {
     "caption": "Poetry: Configure",
     "command": "poetry_config"
+  },
+  {
+    "caption": "Poetry: Serach for a package",
+    "command": "poetry_search"
   }
 ]

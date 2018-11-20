@@ -305,7 +305,7 @@ class PoetryConfigCommand(PoetryCommand):
 
         print("vant input")
         self.window.show_input_panel(
-            "username password",
+            "username password (blank to unset)",
             "{}".format(self.repos_auth_list[choice][1]),
             lambda x: self._run_credentials_command(x, choice),
             None,

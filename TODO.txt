@@ -5,7 +5,6 @@ command to add:
 
 Needed
 ------
-config : add auth
 install good python version
 
 after
@@ -24,3 +23,4 @@ build
 publish
 version
 init
+config : add auth

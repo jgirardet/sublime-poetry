@@ -7,7 +7,6 @@ from .commands import (
     PoetryInstallNoDevCommand,
     PoetryUpdateCommand,
     PoetryAddCommand,
-    PoetryAddDevCommand,
     PoetryRemoveCommand,
     PoetryInstallInVenvCommand,
     PoetryBuildCommand,
@@ -15,7 +14,8 @@ from .commands import (
     PoetryVersionCommand,
     PoetryInitCommand,
     PoetryConfigCommand,
-    PoetrySearchCommand
+    PoetrySearchCommand,
+    PoetryAddPackageUnderCursorCommand,
 )
 
 # __all__ = ['PACKAGE_NAME', "get_settings"]
@@ -28,7 +28,6 @@ __all__ = [
     "PoetryInstallNoDevCommand",
     "PoetryUpdateCommand",
     "PoetryAddCommand",
-    "PoetryAddDevCommand",
     "PoetryRemoveCommand",
     "PoetryInstallInVenvCommand",
     "PoetryBuildCommand",
@@ -36,5 +35,6 @@ __all__ = [
     "PoetryVersionCommand",
     "PoetryInitCommand",
     "PoetryConfigCommand",
-    "PoetrySearchCommand"
+    "PoetrySearchCommand",
+    "PoetryAddPackageUnderCursorCommand"
 ]

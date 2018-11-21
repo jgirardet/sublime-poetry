@@ -25,7 +25,10 @@
   },
   {
     "caption": "Poetry: Add dev package",
-    "command": "poetry_add_dev"
+    "command": "poetry_add",
+    "args": {
+      "dev": true
+    }
   },
   {
     "caption": "Poetry: Remove package",
@@ -54,5 +57,10 @@
   {
     "caption": "Poetry: Serach for a package",
     "command": "poetry_search"
+  },
+
+  {
+    "caption": "Poetry: Add Package under cursor",
+    "command": "poetry_add_package_under_cursor"
   }
 ]

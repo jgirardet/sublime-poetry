@@ -22,17 +22,15 @@ class PoetryCommand(sublime_plugin.WindowCommand):
 
     is_enabled = is_active
 
-
-
     def run_poetry_command(
         self, command, *args, show_out=False, end_duration=POETRY_STATUS_BAR_TIMEOUT
     ):
         if not hasattr(self, "poetry"):
             self.poetry = Poetry(self.window)
-        runner = PoetryThread(command, self.poetry, *args)
-        runner.start()
-        ThreadProgress(runner, show_out, end_duration)
-        return runner
+        self.runner = PoetryThread(command, self.poetry, *args)
+        self.runner.start()
+        ThreadProgress(self.runner, show_out, end_duration)
+        return self.runner
 
     def run_input_command(self, caption, command, initial="", custom=""):
         def to_run(res):
@@ -393,26 +391,27 @@ class PoetryConfigCommand(PoetryCommand):
 
 
 class PoetrySearchCommand(PoetryCommand):
-
-    # def show_result(self):
-
-    def show_result(self, runner):
-        if runner.is_alive():
-            sublime.set_timeout(lambda: self.show_result(runner), 0.2)
-        else:
+    def write_view(self):
+        if not self.runner.poetry.popen.returncode:
             self.result = self.window.new_file()
             self.result.set_scratch(True)
-            self.result.set_name('poetry_search_result')
-            output = runner.output
-            results  = [i.strip() for i in output.splitlines()]
-            self.result.run_command('insert', args={"characters": "\n".join(results)})
-            # self.result.run_command('insert', args={"characters": "mokmok"})
+            self.result.set_name("poetry_search_result")
+            output = self.runner.output
+            results = [i.strip() for i in output.splitlines()]
+            self.result.run_command("insert", args={"characters": "\n".join(results)})
+
+    def wait(self):
+        if self.runner.is_alive():
+            sublime.set_timeout(lambda: self.wait(), 0.2)
+        else:
+            self.write_view()
 
     def search(self, name):
-        runner = self.run_poetry_command('search {}'.format(name))
-        self.show_result(runner)
+        self.run_poetry_command("search {}".format(name))
+        self.wait()
         # self.poetry.popen.wait()
         # if not self.thread.is_alive():
+
     def run(self):
         self.poetry = Poetry(self.window)
-        self.window.show_input_panel("name", "", lambda x: self.search(x),None,  None)
+        self.window.show_input_panel("name", "", lambda x: self.search(x), None, None)

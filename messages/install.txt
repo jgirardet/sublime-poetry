@@ -12,6 +12,8 @@ Changelog
 
 0.5.0: comming
 	add authentication to poetry config
+	add Poetry Search package command
+	add AddPackageUnderCursor command
 
 0.4.0:
 	add Poetry version command

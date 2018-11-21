@@ -2,32 +2,29 @@ from fixtures import PoetryDeferredTestCase, poetry
 
 
 class TestPackageCommands(PoetryDeferredTestCase):
-    pass
+    def test_a_add(self):
 
+        self.window.run_command("poetry_add", args={"custom": "toml"})
+        yield self.status
+        self.assert_in_toml("toml")
 
-#     def test_a_add(self):
+    def test_b_add_dev(self):
 
-#         self.window.run_command("poetry_add", args={"custom": "toml"})
-#         yield self.status
-#         self.assert_in_toml("toml")
+        self.window.run_command("poetry_add", args={"custom": "tomlkit", "dev": True})
+        yield self.status
+        self.assert_in_toml("tomlkit", "dev")
 
-#     def test_b_add_dev(self):
+    def test_c_remove(self):
 
-#         self.window.run_command("poetry_add_dev", args={"custom": "tomlkit"})
-#         yield self.status
-#         self.assert_in_toml("tomlkit", "dev")
+        self.window.run_command("poetry_remove", args={"custom": "toml"})
+        yield self.status
+        self.assert_not_in_toml("toml")
 
-#     def test_c_remove(self):
+    def test_d_remove_dev(self):
 
-#         self.window.run_command("poetry_remove", args={"custom": "toml"})
-#         yield self.status
-#         self.assert_not_in_toml("toml")
-
-#     def test_d_remove_dev(self):
-
-#         self.window.run_command("poetry_remove", args={"custom": "-D tomlkit"})
-#         yield self.status
-#         self.assert_not_in_toml("tomlkit", "dev")
+        self.window.run_command("poetry_remove", args={"custom": "-D tomlkit"})
+        yield self.status
+        self.assert_not_in_toml("tomlkit", "dev")
 
 
 class TestVersionCommands(PoetryDeferredTestCase):

@@ -88,7 +88,9 @@ class PoetryAddCommand(PoetryCommand):
         if package:
             self.run_poetry_command(cmd_line, package)
         else:
-            self.run_input_command("Poetry {}".format(cmd_line), cmd_line, custom)
+            self.run_input_command(
+                "Poetry {}".format(cmd_line), cmd_line, custom=custom
+            )
 
 
 class PoetryRemoveCommand(PoetryCommand):
@@ -287,11 +289,9 @@ class PoetryConfigCommand(PoetryCommand):
         ]
         if "pypi" not in repos:
             new_repos.insert(0, ["pypi", ""])
-        print(new_repos)
         return new_repos
 
     def _run_credentials_command(self, x, choice):
-        print("debut run cred")
         cmd = "config http-basic.{}".format(self.repos_auth_list[choice][0])
         if not x:
             self.run_poetry_command(cmd, "--unset")
@@ -320,12 +320,10 @@ class PoetryConfigCommand(PoetryCommand):
         key, res = self.fconfig_type[choice]
         LOG.debug("key: %s   res: %s", key, res)
 
-        print("ici")
         if res == "+":
             self.run_input_command("New repository : repo.name url", "config", "repo.")
 
         elif res == "?":
-            print("call it")
             self.window.show_quick_panel(
                 self.repos_auth_list,
                 lambda choice: self._callback_credentials(choice),
@@ -354,7 +352,7 @@ class PoetryConfigCommand(PoetryCommand):
                 self.run_poetry_command("config {} --unset".format(key))
 
         else:
-            LOG.error("unkwon")
+            LOG.error("unkwown")
 
         self.run_after_command("poetry_config", self.CB_SLEEP)
 
@@ -408,10 +406,8 @@ class PoetrySearchCommand(PoetryCommand):
             self.write_view()
 
     def search(self, name):
-        self.run_poetry_command("search {}".format(name))
+        self.run_poetry_command("search -N {}".format(name))
         self.wait()
-        # self.poetry.popen.wait()
-        # if not self.thread.is_alive():
 
     def run(self):
         self.poetry = Poetry(self.window)
@@ -419,6 +415,11 @@ class PoetrySearchCommand(PoetryCommand):
 
 
 class PoetryAddPackageUnderCursorCommand(sublime_plugin.TextCommand):
+    def is_active(self):
+        return self.view.name() == "poetry_search_result"
+
+    is_enabled = is_active
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.re_package = re.compile(r"([a-zA-Z0-9\-\_+]+) \(.+\)")

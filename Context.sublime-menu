@@ -1,0 +1,6 @@
+[
+    {
+        "caption": "Poetry: add package under cursor",
+        "command": "poetry_add_package_under_cursor"
+    }
+]

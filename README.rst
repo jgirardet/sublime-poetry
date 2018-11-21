@@ -76,10 +76,14 @@ Use `Ctrl-Shift-P` (Mac: `Cmd-Shift-P`). A pyproject.toml file with a poetry sec
 * Poetry: Init:
     run `poetry init -n`, to create new pyproject.toml file.
 
-*Poetry: Config:
+* Poetry: Config:
     Manage poetry configuration, repositories and authentication.
 
+* Poetry: Search:
+    Search pypi for package by name. you can then install it via command `Poetry: Install package under cursor` or via the context menu.
 
+* Poetry: Add package under cursor:
+    Install a package from search result.
 
 Settings
 ---------

@@ -6,11 +6,11 @@ command to add:
 Needed
 ------
 install good python version
+pyproejct : remove, update to latest
 
 after
 ------
 run : nuld system ?
-search
 shell : via terminus ?
 
 bof:
@@ -19,6 +19,7 @@ check
 show
 
 done:
+search
 build
 publish
 version

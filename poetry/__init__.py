@@ -36,5 +36,5 @@ __all__ = [
     "PoetryInitCommand",
     "PoetryConfigCommand",
     "PoetrySearchCommand",
-    "PoetryAddPackageUnderCursorCommand"
+    "PoetryAddPackageUnderCursorCommand",
 ]

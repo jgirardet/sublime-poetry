@@ -31,17 +31,6 @@ class TestPackagingCommands(PoetryDeferredTestCase):
         )
         self.assertTrue((self.dirpath / "dist" / "rien-0.1.0.tar.gz").exists())
 
-    # def test_publish(self):
-    #     if (self.dirpath / "dist").exists():
-    #         shutil.rmtree(str(self.dirpath / "dist"))
-    #     self.window.run_command("poetry_build")
-    #     self.window.run_command("poetry_publish")
-    #     yield self.status
-    #     self.assertTrue(
-    #         (self.dirpath / "dist" / "rien-0.1.0-py2.py3-none-any.whl").exists()
-    #     )
-    #     self.assertTrue((self.dirpath / "dist" / "rien-0.1.0.tar.gz").exists())
-
 
 class TestPublishClass(TestCase):
     def setUp(self):
@@ -92,6 +81,7 @@ class TestPublishClass(TestCase):
             poetry.poetry.Poetry, "config", new_callable=PropertyMock
         ) as config:
             config.return_value = {"repositories": {}}
+            self.pp.get_credential = lambda x: None
             self.pp.window.show_input_panel = lambda v, w, x, y, z: self.pp.run_publish(
                 "login mdp".split()
             )
@@ -104,6 +94,7 @@ class TestPublishClass(TestCase):
         with patch.object(
             poetry.poetry.Poetry, "config", new_callable=PropertyMock
         ) as config:
+            self.pp.get_credential = lambda x: None
             config.return_value = {"repositories": {"foo": "http://foo"}}
             self.pp.window.show_quick_panel = lambda v, w: self.pp.setup_publish(0)
             self.pp.window.show_input_panel = lambda v, w, x, y, z: self.pp.run_publish(

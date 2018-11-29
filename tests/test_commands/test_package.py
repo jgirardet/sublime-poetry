@@ -1,7 +1,10 @@
 from fixtures import PoetryDeferredTestCase, poetry
+from unittest.mock import patch
 
 
 class TestPackageCommands(PoetryDeferredTestCase):
+    """ test add/remove commands """
+
     def test_a_add(self):
 
         self.window.run_command("poetry_add", args={"custom": "toml"})
@@ -27,7 +30,34 @@ class TestPackageCommands(PoetryDeferredTestCase):
         self.assert_not_in_toml("tomlkit", "dev")
 
 
+class TestUnderCursor(PoetryDeferredTestCase):
+    def test_add_under_cursor_dev(self):
+        self.view.set_name("poetry_search_result")
+
+        self.view.run_command("insert", args={"characters": "toml (1.1.1)"})
+        with patch("sublime.yes_no_cancel_dialog", return_value=1):
+            self.view.run_command("poetry_add_package_under_cursor")
+
+        yield self.status
+
+        self.assert_in_toml("toml", "dev")
+        self.assert_not_in_toml("toml")
+
+    def test_add_under_cursor_regular(self):
+        self.view.set_name("poetry_search_result")
+
+        self.view.run_command("insert", args={"characters": "toml (1.1.1)"})
+        with patch("sublime.yes_no_cancel_dialog", return_value=2):
+            self.view.run_command("poetry_add_package_under_cursor")
+
+        yield self.status
+
+        self.assert_in_toml("toml")
+
+
 class TestVersionCommands(PoetryDeferredTestCase):
+    """test version command"""
+
     def setUp(self):
         super().setUp()
         self.pv = poetry.commands.PoetryVersionCommand(self.window)

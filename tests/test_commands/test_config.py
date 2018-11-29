@@ -139,7 +139,7 @@ class TestConfig(PoetryDeferredTestCase):
         def run_test(choice):
             init()
             self.pc.run_after_command = MagicMock()
-            with patch.object(self.pc.window, "show_quick_panel") as sq:
+            with patch.object(self.pc.window, "show_quick_panel"):
                 self.pc.run()
                 with patch.object(
                     self.pc.window,
@@ -147,7 +147,7 @@ class TestConfig(PoetryDeferredTestCase):
                     lambda a, z, e, r, t: self.pc._run_credentials_command(
                         "name pwd", choice
                     ),
-                ) as si:
+                ):
                     self.pc._callback_credentials(choice)
 
         # pypi added if was unset
@@ -159,7 +159,7 @@ class TestConfig(PoetryDeferredTestCase):
         )
 
         # existing repo in auth.toml
-        run_test(2)
+        run_test(1)
         yield self.status
         self.assertEqual(
             Poetry(self.window).auth["http-basic"]["one"],
@@ -167,7 +167,7 @@ class TestConfig(PoetryDeferredTestCase):
         )
 
         # existing repo in config.toml
-        run_test(1)
+        run_test(2)
         yield self.status
         self.assertEqual(
             Poetry(self.window).auth["http-basic"]["nothing"],

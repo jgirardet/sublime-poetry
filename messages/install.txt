@@ -10,7 +10,7 @@ Installation
 Changelog
 -----------
 
-0.5.0: comming
+0.5.0:
 	add authentication to poetry config
 	add Poetry Search package command
 	add AddPackageUnderCursor command

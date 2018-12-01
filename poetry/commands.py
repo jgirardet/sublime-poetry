@@ -444,3 +444,49 @@ class PoetryAddPackageUnderCursorCommand(sublime_plugin.TextCommand):
             )
         else:
             LOG.debug("Add package under cursor cancelled")
+
+
+class PoetryShell(PoetryCommand):
+    def is_enabled(self):
+        if not super().is_enabled():
+            return False
+
+        try:
+            from Terminus import terminus  # noqa
+        except ImportError:
+            return False
+        return True
+
+    def is_active(self):
+        if not super().is_active():
+            return False
+
+        try:
+            from Terminus import terminus  # noqa
+        except ImportError:
+            return False
+        return True
+
+    def run(self):
+        LOG.debug("Running Poetry Shell Command")
+        self.poetry = Poetry(self.window)
+
+        used_venv = self.poetry.used_venv()
+
+        if str(used_venv) == "NA":
+            LOG.debug("No virtualenv installed, aborting")
+            return
+
+        cmd_line = used_venv / VENV_BIN_DIR / "activate"
+
+        if self.poetry.platform != "windows":
+            cmd_line = "source {}\n".format(str(cmd_line))
+
+        self.window.run_command(
+            "terminus_open", {"config_name": "Default", "panel_name": "Poetry_shell"}
+        )
+        sublime.set_timeout(
+            lambda: self.window.run_command(
+                "terminus_send_string", {"string": cmd_line}
+            )
+        )

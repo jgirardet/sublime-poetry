@@ -16,6 +16,7 @@ from .commands import (
     PoetryConfigCommand,
     PoetrySearchCommand,
     PoetryAddPackageUnderCursorCommand,
+    PoetryShell
 )
 
 # __all__ = ['PACKAGE_NAME', "get_settings"]
@@ -37,4 +38,5 @@ __all__ = [
     "PoetryConfigCommand",
     "PoetrySearchCommand",
     "PoetryAddPackageUnderCursorCommand",
+    "PoetryShell"
 ]

@@ -62,5 +62,9 @@
   {
     "caption": "Poetry: Add Package under cursor",
     "command": "poetry_add_package_under_cursor"
+  },
+  {
+    "caption": "Poetry: Shell",
+    "command": "poetry_shell"
   }
 ]

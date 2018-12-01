@@ -85,6 +85,9 @@ Use `Ctrl-Shift-P` (Mac: `Cmd-Shift-P`). A pyproject.toml file with a poetry sec
 * Poetry: Add package under cursor:
     Install a package from search result.
 
+* Poetry: Shell:
+    Spawn a new shell with activated virtualenv
+
 Settings
 ---------
 

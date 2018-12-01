@@ -3,6 +3,7 @@ import logging
 import shutil
 import time
 import re
+import os
 
 import sublime_plugin
 import sublime
@@ -477,10 +478,21 @@ class PoetryShell(PoetryCommand):
             LOG.debug("No virtualenv installed, aborting")
             return
 
-        cmd_line = used_venv / VENV_BIN_DIR / "activate"
+        activate = "activate"
 
         if self.poetry.platform != "windows":
-            cmd_line = "source {}\n".format(str(cmd_line))
+            default_shell = os.environ['SHELL']
+            if "fish" in default_shell:
+                activate += ".fish"
+            if "csh" in default_shell:
+                activate += ".csh"
+
+        cmd_line = used_venv / VENV_BIN_DIR / activate
+
+        if self.poetry.platform != "windows":
+            cmd_line = ". {}\n".format(str(cmd_line))
+        else:
+            cmd_line = "{}\n".format(str(cmd_line))
 
         self.window.run_command(
             "terminus_open", {"config_name": "Default", "panel_name": "Poetry_shell"}

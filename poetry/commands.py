@@ -11,7 +11,7 @@ import sublime
 from .poetry import Poetry, Venv
 from .compat import VENV_BIN_DIR
 from .utils import poetry_used, timed, flatten_dict
-from .consts import PACKAGE_NAME, POETRY_STATUS_BAR_TIMEOUT
+from .consts import PACKAGE_NAME, POETRY_STATUS_BAR_TIMEOUT, ACTIVE_VERSION
 from .interpreters import PythonInterpreter
 from .command_runner import PoetryThread, ThreadProgress
 
@@ -44,6 +44,46 @@ class PoetryCommand(sublime_plugin.WindowCommand):
             self.window.show_input_panel(
                 caption, initial, lambda x: to_run(x), None, None
             )
+
+    def run_after_command(self, fn, sleep):
+        """run a  fn after checking after ThreadProgress end"""
+
+        if not hasattr(self, "view"):
+            self.view = self.window.active_view()
+
+        def reloader():
+            sublime.set_timeout_async(lambda: checker(fn, sleep), sleep)
+
+        def checker(fn, sleep):
+            if "succes" in self.view.get_status(PACKAGE_NAME):
+                print("checker")
+                sublime.set_timeout_async(fn, 0)
+                return
+            if "fail" in self.view.get_status(PACKAGE_NAME):
+                return
+            reloader()
+
+        reloader()
+
+    # def wait_complete(self, fn):
+    #     if self.runner.is_alive():
+    #         sublime.set_timeout(lambda: self.wait(), 0.2)
+    #     else:
+    #         fn()
+
+    def quick_status(self, message, timeout=POETRY_STATUS_BAR_TIMEOUT):
+        if not hasattr(self, "view"):
+            self.view = self.window.active_view()
+        self.view = self.window.active_view()
+        self.view.set_status(PACKAGE_NAME, message)
+        sublime.set_timeout(lambda: self.view.erase_status(PACKAGE_NAME), timeout)
+
+    def set_sb_version(self, version):
+        print("set sb")
+        if not hasattr(self, "view"):
+            self.view = self.window.active_view()
+
+        self.view.set_status(ACTIVE_VERSION, "Poetry: {}".format(version))
 
 
 class PoetrySetPythonInterpreterCommand(PoetryCommand):
@@ -125,44 +165,82 @@ class PoetryRemoveCommand(PoetryCommand):
             )
 
 
-class PoetryInstallInVenvCommand(PoetryCommand):
-    def create_and_install(self, path, version):
-        new_venv = Venv.create(path, version, self.poetry.cwd)
+class PoetryEnvUseCommand(PoetryCommand):
+    def _run(self, choice):
+        env = self.merged[choice]
 
-        self.window.run_command("poetry_install")
-
-    def callback(self, id):
-        path, version = self.python_interpreter.execs_and_pyenv[id]
-        LOG.debug("using %s with version %s", path, version)
-        LOG.debug("current .venv version : %s", self.poetry.venv.version)
-        if version == self.poetry.venv.version:
-            LOG.debug("version in .venv is the same as selected")
-            go_on = sublime.ok_cancel_dialog(
-                ".venv is already with version {}. Continue ?".format(version)
-            )
-            if not go_on:
-                LOG.debug("Install command interupted by user")
+        if choice < len(self.envs):
+            # already know interpreters
+            if "Activated" not in env:
+                self.run_poetry_command("env use", env[-3:])
+            else:
+                self.quick_status(env + " nothing to do")
                 return
-
-        print(self.poetry.venv)
-        if self.poetry.venv.exists():
-            LOG.debug("Removing old .venv")
-            shutil.rmtree(str(self.poetry.venv))
         else:
-            LOG.debug(".venv doesn not exists")
+            # not known interpreters
+            self.run_poetry_command("env use", env)
 
-        sublime.set_timeout_async(lambda: self.create_and_install(path, version), 0)
+        self.run_after_command(
+            lambda: self.window.run_command("poetry_set_python_interpreter"), 50
+        )
 
     def run(self):
         self.poetry = Poetry(self.window)
-        self.interpreters = []
-        self.python_interpreter = PythonInterpreter()
-        for i in self.python_interpreter.execs_and_pyenv:
-            self.interpreters.append("{}  {}".format(*i))
 
+        # poetry known envs
+        self.envs = self.poetry.env_list
+
+        # systems envs
+        interpreters = []
+        python_interpreter = PythonInterpreter()
+        interpreters = [
+            interpreter[0] for interpreter in python_interpreter.execs_and_pyenv
+        ]
+
+        # merge
+        self.merged = self.envs + interpreters
         self.window.show_quick_panel(
-            self.interpreters, lambda choice: self.callback(choice)
+            self.merged, lambda choice: self._run(choice), sublime.MONOSPACE_FONT
         )
+
+
+# class PoetryInstallInVenvCommand(PoetryCommand):
+#     def create_and_install(self, path, version):
+#         new_venv = Venv.create(path, version, self.poetry.cwd)
+
+#         self.window.run_command("poetry_install")
+
+#     def callback(self, id):
+#         path, version = self.python_interpreter.execs_and_pyenv[id]
+#         LOG.debug("using %s with version %s", path, version)
+#         LOG.debug("current .venv version : %s", self.poetry.venv.version)
+#         if version == self.poetry.venv.version:
+#             LOG.debug("version in .venv is the same as selected")
+#             go_on = sublime.ok_cancel_dialog(
+#                 ".venv is already with version {}. Continue ?".format(version)
+#             )
+#             if not go_on:
+#                 LOG.debug("Install command interupted by user")
+#                 return
+
+#         print(self.poetry.venv)
+#         if self.poetry.venv.exists():
+#             LOG.debug("Removing old .venv")
+#             shutil.rmtree(str(self.poetry.venv))
+#         else:
+#             LOG.debug(".venv doesn not exists")
+
+#         sublime.set_timeout_async(lambda: self.create_and_install(path, version), 0)
+
+# def run(self):
+#     self.poetry = Poetry(self.window)
+#     self.interpreters = []
+#     self.python_interpreter = PythonInterpreter()
+#     for i in self.python_interpreter.execs_and_pyenv:
+#         self.interpreters.append("{}  {}".format(*i))
+#     self.window.show_quick_panel(
+#         self.interpreters, lambda choice: self.callback(choice)
+#     )
 
 
 class PoetryBuildCommand(PoetryCommand):
@@ -481,7 +559,7 @@ class PoetryShell(PoetryCommand):
         activate = "activate"
 
         if self.poetry.platform != "windows":
-            default_shell = os.environ['SHELL']
+            default_shell = os.environ["SHELL"]
             if "fish" in default_shell:
                 activate += ".fish"
             if "csh" in default_shell:

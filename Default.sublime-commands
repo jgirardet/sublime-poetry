@@ -4,16 +4,16 @@
     "command": "poetry_set_python_interpreter"
   },
   {
+    "caption": "Poetry: Env Use",
+    "command": "poetry_env_use"
+  },
+  {
     "caption": "Poetry: Install",
     "command": "poetry_install"
   },
   {
     "caption": "Poetry: Install --no-dev",
     "command": "poetry_install_no_dev"
-  },
-  {
-    "caption": "Poetry: Install in Selected Venv",
-    "command": "poetry_install_in_venv"
   },
   {
     "caption": "Poetry: Update",

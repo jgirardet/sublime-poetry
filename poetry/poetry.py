@@ -163,16 +163,13 @@ class Poetry:
         return self._cwd
 
     def used_venv(self):
-        self.run("debug:info")
-        out = self.output
-        LOG.debug("used_venv_out : %s", out)
-        if self.platform == "windows":
-            regex = rb"Virtualenv(?:\r\r\n.*)* \* (Path:.+)"
-        else:
-            regex = rb"Virtualenv(?:\n.*)* \* (Path:.+)"
+        self.run("env info")
+        output = self.output
+        _output = output.split()
+        index = _output.index(b'Path:')
+        venv = _output[index+1].decode()
 
-        venv = (re.search(regex, out).group(1).split()[-1].strip()).decode()
-        LOG.debug("get_venv_path : %s", venv)
+        LOG.debug("used venv : %s", venv)
         if venv != b"NA":
             return Path(venv)
         else:
@@ -269,3 +266,9 @@ class Poetry:
     @property
     def package_version(self):
         return toml.loads(self.pyproject.read_text())["tool"]["poetry"]["version"]
+
+    @property
+    def env_list(self):
+        self.run('env list')
+        return self.output.decode().splitlines()
+    

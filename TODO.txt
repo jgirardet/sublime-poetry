@@ -3,6 +3,23 @@ create a venv class outside poetry class
 
 command to add:
 
+
+pour la 1.0
+------------
+Fixer : 
+install inselected should not install in .venv
+
+debug info
+
+env:
+	info
+	use
+	list
+	remove
+
+fix auth
+autsetpython interpreter after env change
+
 Needed
 ------
 install good python version
@@ -12,13 +29,17 @@ after
 ------
 run : nuld system ?
 shell : via terminus ?
+command to complete : 'poetry run blabal'
 
 bof:
+-----
 lock
 check
 show
+cache clear
 
 done:
+-----
 search
 build
 publish

@@ -5,6 +5,7 @@ from .consts import (
     SETTINGS_NS_PREFIX,
     CONFIG_OPTIONS,
     KEY_ERROR_MARKER,
+    POETRY_STATUS_BAR_TIMEOUT,
 )
 
 import importlib.util
@@ -188,3 +189,4 @@ def flatten_dict(d):
                 yield key, value
 
     return dict(items())
+

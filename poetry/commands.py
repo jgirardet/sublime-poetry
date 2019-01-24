@@ -11,9 +11,15 @@ import sublime
 from .poetry import Poetry, Venv
 from .compat import VENV_BIN_DIR
 from .utils import poetry_used, timed, flatten_dict
-from .consts import PACKAGE_NAME, POETRY_STATUS_BAR_TIMEOUT, ACTIVE_VERSION
+from .consts import (
+    PACKAGE_NAME,
+    POETRY_STATUS_BAR_TIMEOUT,
+    ACTIVE_VERSION,
+    CHOICE_SEPARATOR,
+)
 from .interpreters import PythonInterpreter
 from .command_runner import PoetryThread, ThreadProgress
+from .helpers import SimpleListInputHandler
 
 LOG = logging.getLogger(PACKAGE_NAME)
 
@@ -56,7 +62,6 @@ class PoetryCommand(sublime_plugin.WindowCommand):
 
         def checker(fn, sleep):
             if "succes" in self.view.get_status(PACKAGE_NAME):
-                print("checker")
                 sublime.set_timeout_async(fn, 0)
                 return
             if "fail" in self.view.get_status(PACKAGE_NAME):
@@ -92,19 +97,23 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
         sublime.set_timeout_async(self._run, 0)
 
     def _run(self):
-
+        venv = self.poetry.used_venv()
         project = defaultdict(dict)
         project.update(self.window.project_data())
-        python_interpreter = self.poetry.used_venv() / VENV_BIN_DIR / "python"
+        prefix = ""
 
-        project["settings"]["python_interpreter"] = str(python_interpreter)
+        if not venv:
+            self.quick_status("Python Interpreter could not be set")
+            if "python_interpreter" in project["settings"]:
+                del project["settings"]["python_interpreter"]
+            prefix = "No "
+
+        else:
+            python_interpreter = venv / VENV_BIN_DIR / "python"
+            project["settings"]["python_interpreter"] = str(python_interpreter)
 
         self.window.set_project_data(project)
-        view = self.window.active_view()
-        view.set_status(PACKAGE_NAME, "python interpreter set !")
-        sublime.set_timeout(
-            lambda: view.erase_status(PACKAGE_NAME), POETRY_STATUS_BAR_TIMEOUT
-        )
+        self.quick_status(prefix + "python interpreter set")
 
 
 class PoetryInstallCommand(PoetryCommand):
@@ -166,36 +175,25 @@ class PoetryRemoveCommand(PoetryCommand):
 
 
 class PoetryEnvUseCommand(PoetryCommand):
-    def _run(self, choice):
+    def run(self, choice):
 
-        if choice == -1:
-            return
-
-        env = self.merged[choice]
-
-        if "available" in env or not env:
-            self.quick_status('Invalid Choice')
-            sublime.set_timeout_async(lambda: self.window.run_command('poetry_env_use', 0))
-            return
-
-        if env in self.envs:
+        if choice in self.envs:
             # already know interpreters
-            if "Activated" not in env:
-                self.run_poetry_command("env use", env[-3:])
-            else:
-                self.quick_status(env + " nothing to do")
+            if "Activated" in choice:
+                self.quick_status(choice + " nothing to do")
                 return
+            else:
+                self.run_poetry_command("env use", choice[-3:])
         else:
             # not known interpreters
-            self.run_poetry_command("env use", env)
+            self.run_poetry_command("env use", choice)
 
         self.run_after_command(
             lambda: self.window.run_command("poetry_set_python_interpreter"), 50
         )
 
-    def run(self):
-        self.poetry = Poetry(self.window)
-
+    @property
+    def all_envs(self):
         # poetry known envs
         self.envs = self.poetry.env_list
 
@@ -207,43 +205,32 @@ class PoetryEnvUseCommand(PoetryCommand):
         ]
 
         # merge
-        self.merged = ["****** available envs *******"]+self.envs + ["", "****** available interpereters ******"] +interpreters
-        self.window.show_quick_panel(
-            self.merged, lambda choice: self._run(choice), sublime.MONOSPACE_FONT
+        return (
+            [CHOICE_SEPARATOR + " available envs " + CHOICE_SEPARATOR]
+            + self.envs
+            + ["", CHOICE_SEPARATOR + " available interpereters " + CHOICE_SEPARATOR]
+            + interpreters
         )
+
+    def input(self, args):
+        self.poetry = Poetry(self.window)
+        return SimpleListInputHandler(self.all_envs)
+
 
 class PoetryEnvRemoveCommand(PoetryCommand):
-    def _after(self, venv_name):
-        if venv_name in self.view.settings().get('python_interpreter'):
-            project = defaultdict(dict)
-            project.update(self.window.project_data())
-            del project["settings"]['python_interpreter']
-            self.window.set_project_data(project)
-
-    def _run(self,choice):
-        if choice == -1:
-            return
-
-        env = self.envs[choice].split()[0] # prevent activated word
-        self.run_poetry_command('env remove',env)
-        self.run_after_command(lambda: self._after(env), 100)
-
-    def run(self):
-        self.poetry = Poetry(self.window)
-        self.envs = self.poetry.env_list
-        self.window.show_quick_panel(
-            self.envs, lambda choice: self._run(choice), sublime.MONOSPACE_FONT
+    def run(self, choice):
+        env = choice.split()[0]
+        self.run_poetry_command("env remove", env)
+        self.run_after_command(
+            lambda: self.window.run_command("poetry_set_python_interpreter"), 100
         )
 
-class PoetryRunCommand(PoetryCommand):
-
-    def input(self,arg):
-        self.args  = arg
-        return arg
-
-    def run(self):
+    def input(self, args):
         self.poetry = Poetry(self.window)
-        self.run_poetry_command('run', self.args)
+        envs = self.poetry.env_list
+        if not envs:
+            envs = [CHOICE_SEPARATOR + " nothing to do " + CHOICE_SEPARATOR]
+        return SimpleListInputHandler(envs)
 
 
 class PoetryBuildCommand(PoetryCommand):
@@ -528,7 +515,7 @@ class PoetryAddPackageUnderCursorCommand(sublime_plugin.TextCommand):
             LOG.debug("Add package under cursor cancelled")
 
 
-class PoetryShell(PoetryCommand):
+class PoetryShellCommand(PoetryCommand):
     def is_enabled(self):
         if not super().is_enabled():
             return False
@@ -555,8 +542,8 @@ class PoetryShell(PoetryCommand):
 
         used_venv = self.poetry.used_venv()
 
-        if str(used_venv) == "NA":
-            LOG.debug("No virtualenv installed, aborting")
+        if used_venv is None:
+            self.quick_status("No virtualenv installed, aborting")
             return
 
         activate = "activate"

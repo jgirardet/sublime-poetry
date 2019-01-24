@@ -166,11 +166,11 @@ class Poetry:
         self.run("env info")
         output = self.output
         _output = output.split()
-        index = _output.index(b'Path:')
-        venv = _output[index+1].decode()
+        index = _output.index(b"Path:")
+        venv = _output[index + 1].decode()
 
         LOG.debug("used venv : %s", venv)
-        if venv != b"NA":
+        if venv != "NA":
             return Path(venv)
         else:
             return None
@@ -269,6 +269,5 @@ class Poetry:
 
     @property
     def env_list(self):
-        self.run('env list')
+        self.run("env list")
         return self.output.decode().splitlines()
-    

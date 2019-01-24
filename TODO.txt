@@ -7,20 +7,8 @@ command to add:
 pour la 1.0
 ------------
 Fixer : 
-install inselected should not install in .venv
-
-debug info
-
-env:
-	info
-	use
-	list
-	remove
 
 fix auth
-autsetpython interpreter after env change
-
-shell ???
 
 Needed
 ------

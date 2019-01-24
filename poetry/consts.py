@@ -8,4 +8,5 @@ CONFIG_OPTIONS = ["poetry_log", "poetry_binary"]
 
 
 POETRY_STATUS_BAR_TIMEOUT = 1500
-ACTIVE_VERSION = "poetry_py" # statusbar id to show current pyversion
+ACTIVE_VERSION = "poetry_py"  # statusbar id to show current pyversion
+CHOICE_SEPARATOR = "******"

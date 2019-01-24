@@ -42,14 +42,18 @@ Use `Ctrl-Shift-P` (Mac: `Cmd-Shift-P`). A pyproject.toml file with a poetry sec
 * Poetry: Set python interpreter:
 	Change `python_interpreter` in your project_settings to make your project match your virtualenv.
 
+* Poetry: Env use:
+    Find Available virtual environment for this project and other python interpreters on system and create and Run `poetry env use {selection}`. It will auto-update the python_interpreter in settings.
+
+* Poetry: Env remove:
+    Remove desired virtual environment. It will auto-update the python_interpreter settings.
+    
 * Poetry: Install:
     Run `poetry install` on current project.
 
 * Poetry: Install --no-dev:
     Run `poetry install --no-dev` on current project.
 
-* Poetry: Install in Selected Venv:
-    Find Available python interpreters on system and create .venv with selected python version then Run `poetry install` on current project.
 
 * Poetry: Update:
     Run `poetry update` on current project.

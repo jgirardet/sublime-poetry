@@ -167,9 +167,18 @@ class PoetryRemoveCommand(PoetryCommand):
 
 class PoetryEnvUseCommand(PoetryCommand):
     def _run(self, choice):
+
+        if choice == -1:
+            return
+
         env = self.merged[choice]
 
-        if choice < len(self.envs):
+        if "available" in env or not env:
+            self.quick_status('Invalid Choice')
+            sublime.set_timeout_async(lambda: self.window.run_command('poetry_env_use', 0))
+            return
+
+        if env in self.envs:
             # already know interpreters
             if "Activated" not in env:
                 self.run_poetry_command("env use", env[-3:])
@@ -198,11 +207,33 @@ class PoetryEnvUseCommand(PoetryCommand):
         ]
 
         # merge
-        self.merged = self.envs + interpreters
+        self.merged = ["****** available envs *******"]+self.envs + ["", "****** available interpereters ******"] +interpreters
         self.window.show_quick_panel(
             self.merged, lambda choice: self._run(choice), sublime.MONOSPACE_FONT
         )
 
+class PoetryEnvRemoveCommand(PoetryCommand):
+    def _after(self, venv_name):
+        if venv_name in self.view.settings().get('python_interpreter'):
+            project = defaultdict(dict)
+            project.update(self.window.project_data())
+            del project["settings"]['python_interpreter']
+            self.window.set_project_data(project)
+
+    def _run(self,choice):
+        if choice == -1:
+            return
+
+        env = self.envs[choice].split()[0] # prevent activated word
+        self.run_poetry_command('env remove',env)
+        self.run_after_command(lambda: self._after(env), 100)
+
+    def run(self):
+        self.poetry = Poetry(self.window)
+        self.envs = self.poetry.env_list
+        self.window.show_quick_panel(
+            self.envs, lambda choice: self._run(choice), sublime.MONOSPACE_FONT
+        )
 
 # class PoetryInstallInVenvCommand(PoetryCommand):
 #     def create_and_install(self, path, version):

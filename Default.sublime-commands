@@ -8,6 +8,10 @@
     "command": "poetry_env_use"
   },
   {
+    "caption": "Poetry: Env Remove",
+    "command": "poetry_env_remove"
+  },
+  {
     "caption": "Poetry: Install",
     "command": "poetry_install"
   },

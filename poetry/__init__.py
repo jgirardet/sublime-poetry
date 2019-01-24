@@ -4,6 +4,7 @@ from .theme import tweak_theme
 from .commands import (
     PoetrySetPythonInterpreterCommand,
     PoetryEnvUseCommand,
+    PoetryEnvRemoveCommand,
     PoetryInstallCommand,
     PoetryInstallNoDevCommand,
     PoetryUpdateCommand,
@@ -27,6 +28,7 @@ __all__ = [
     "PoetrySetPythonInterpreterCommand",
     "PoetryEnvUseCommand",
     "PoetryInstallCommand",
+    "PoetryEnvRemoveCommand",
     "PoetryInstallNoDevCommand",
     "PoetryUpdateCommand",
     "PoetryAddCommand",

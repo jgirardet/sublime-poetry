@@ -235,43 +235,15 @@ class PoetryEnvRemoveCommand(PoetryCommand):
             self.envs, lambda choice: self._run(choice), sublime.MONOSPACE_FONT
         )
 
-# class PoetryInstallInVenvCommand(PoetryCommand):
-#     def create_and_install(self, path, version):
-#         new_venv = Venv.create(path, version, self.poetry.cwd)
+class PoetryRunCommand(PoetryCommand):
 
-#         self.window.run_command("poetry_install")
+    def input(self,arg):
+        self.args  = arg
+        return arg
 
-#     def callback(self, id):
-#         path, version = self.python_interpreter.execs_and_pyenv[id]
-#         LOG.debug("using %s with version %s", path, version)
-#         LOG.debug("current .venv version : %s", self.poetry.venv.version)
-#         if version == self.poetry.venv.version:
-#             LOG.debug("version in .venv is the same as selected")
-#             go_on = sublime.ok_cancel_dialog(
-#                 ".venv is already with version {}. Continue ?".format(version)
-#             )
-#             if not go_on:
-#                 LOG.debug("Install command interupted by user")
-#                 return
-
-#         print(self.poetry.venv)
-#         if self.poetry.venv.exists():
-#             LOG.debug("Removing old .venv")
-#             shutil.rmtree(str(self.poetry.venv))
-#         else:
-#             LOG.debug(".venv doesn not exists")
-
-#         sublime.set_timeout_async(lambda: self.create_and_install(path, version), 0)
-
-# def run(self):
-#     self.poetry = Poetry(self.window)
-#     self.interpreters = []
-#     self.python_interpreter = PythonInterpreter()
-#     for i in self.python_interpreter.execs_and_pyenv:
-#         self.interpreters.append("{}  {}".format(*i))
-#     self.window.show_quick_panel(
-#         self.interpreters, lambda choice: self.callback(choice)
-#     )
+    def run(self):
+        self.poetry = Poetry(self.window)
+        self.run_poetry_command('run', self.args)
 
 
 class PoetryBuildCommand(PoetryCommand):

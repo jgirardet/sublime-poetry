@@ -20,6 +20,8 @@ env:
 fix auth
 autsetpython interpreter after env change
 
+shell ???
+
 Needed
 ------
 install good python version

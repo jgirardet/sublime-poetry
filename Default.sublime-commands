@@ -70,5 +70,9 @@
   {
     "caption": "Poetry: Shell",
     "command": "poetry_shell"
+  },
+  {
+    "caption": "Poetry: Run",
+    "command": "poetry_run"
   }
 ]

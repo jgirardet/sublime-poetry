@@ -13,9 +13,13 @@ class SimpleListInputHandler(sublime_plugin.ListInputHandler):
         return "choice"
 
     def validate(self, value):
-        if not value or value.startswith(CHOICE_SEPARATOR):
+        if isinstance(value, list):
+            return True
+
+        elif not value or value.startswith(CHOICE_SEPARATOR):
             return False
         return True
+
 
 def titleise(title):
     return " ".join((CHOICE_SEPARATOR, title.strip(), CHOICE_SEPARATOR))

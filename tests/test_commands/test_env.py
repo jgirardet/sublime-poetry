@@ -1,14 +1,11 @@
 from fixtures import poetry, PoetryDeferredTestCase
-import os
 
 # from pathlib import Path
-from unittest.mock import patch, PropertyMock, MagicMock
-import tempfile
+from unittest.mock import MagicMock
 
 Poetry = poetry.poetry.Poetry
 Path = poetry.utils.Path
 PACKAGE_NAME = poetry.consts.PACKAGE_NAME
-import toml
 
 
 class TestEnvUse(PoetryDeferredTestCase):

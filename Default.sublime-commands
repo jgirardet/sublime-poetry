@@ -59,6 +59,10 @@
     "command": "poetry_config"
   },
   {
+    "caption": "Poetry: CCCCConfigure",
+    "command": "poetry_configg"
+  },
+  {
     "caption": "Poetry: Serach for a package",
     "command": "poetry_search"
   },

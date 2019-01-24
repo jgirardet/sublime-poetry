@@ -16,3 +16,6 @@ class SimpleListInputHandler(sublime_plugin.ListInputHandler):
         if not value or value.startswith(CHOICE_SEPARATOR):
             return False
         return True
+
+def titleise(title):
+    return " ".join((CHOICE_SEPARATOR, title.strip(), CHOICE_SEPARATOR))

@@ -19,7 +19,7 @@ from .consts import (
 )
 from .interpreters import PythonInterpreter
 from .command_runner import PoetryThread, ThreadProgress
-from .helpers import SimpleListInputHandler
+from .helpers import SimpleListInputHandler, titleise
 
 LOG = logging.getLogger(PACKAGE_NAME)
 
@@ -300,26 +300,18 @@ class PoetryPublishCommand(PoetryCommand):
 
 
 class PoetryVersionCommand(PoetryCommand):
-    def _run_version(self, choice):
-        if choice == -1 or choice == 0:
-            LOG.debug("Bump version cancelled")
-            return
-        selected = self.actions[choice]
-        LOG.debug("Bump version {}".format(selected))
+    def run(self, choice):
+        LOG.debug("Bump version {}".format(choice))
         self.run_poetry_command(
-            "version {}".format(selected), show_out=True, end_duration=3000
+            "version {}".format(choice), show_out=True, end_duration=3000
         )
 
-    def run(self):
+    def input(self, args):
         self.poetry = Poetry(self.window)
-        self.actions = "patch minor major prepatch preminor premajor prerelease".split()
-        current = "current {}".format(self.poetry.package_version)
-        self.actions.insert(0, current)
-        self.window.show_quick_panel(
-            self.actions,
-            lambda choice: self._run_version(choice),
-            sublime.MONOSPACE_FONT,
-        )
+        actions = "patch minor major prepatch preminor premajor prerelease".split()
+        current = titleise("current {} ".format(self.poetry.package_version))
+        actions.insert(0, current)
+        return SimpleListInputHandler(actions)
 
 
 class PoetryInitCommand(sublime_plugin.WindowCommand):

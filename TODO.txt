@@ -36,3 +36,6 @@ publish
 version
 init
 config : add auth
+env use/remove
+install
+add/remove package

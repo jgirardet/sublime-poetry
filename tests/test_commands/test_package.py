@@ -63,25 +63,18 @@ class TestVersionCommands(PoetryDeferredTestCase):
         self.pv = poetry.commands.PoetryVersionCommand(self.window)
 
     def test_a_patch(self):
-        self.pv.window.show_quick_panel = lambda x, y, z: self.pv._run_version(1)
-        self.pv.run()
+        self.pv.run("patch")
         yield self.status
         self.assertEqual("0.1.1", self.pv.poetry.package_version)
 
     def test_b_minor(self):
-        self.pv.window.show_quick_panel = lambda x, y, z: self.pv._run_version(2)
-        self.pv.run()
+        self.pv.run("minor")
         yield self.status
         self.assertEqual("0.2.0", self.pv.poetry.package_version)
 
-    def test_c_cancel(self):
-        self.pv.window.show_quick_panel = lambda x, y, z: self.pv._run_version(-1)
-        self.pv.run()
-        yield 1000
-        self.assertEqual("0.2.0", self.pv.poetry.package_version)
 
-    def test_d_current(self):
+    def test_d_current_choices(self):
         self.pv.window.show_quick_panel = lambda x, y, z: self.pv._run_version(-0)
-        self.pv.run()
-        yield 1000
-        self.assertEqual("0.2.0", self.pv.poetry.package_version)
+        a = self.pv.input("args")
+        # yield 1000
+        self.assertEqual(a.list_items(), ['****** current 0.2.0 ******', 'patch', 'minor', 'major', 'prepatch', 'preminor', 'premajor', 'prerelease'])

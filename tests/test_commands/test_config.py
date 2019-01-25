@@ -52,12 +52,8 @@ class TestConfig(PoetryDeferredTestCase):
             self.assertEqual(
                 self.po.config["settings"]["virtualenvs"]["path"], "nothing"
             )
-            # select the good one
 
-            self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(
-                self.choose("path")
-            )
-            self.pc.run()
+            self.pc.run(("settings.virtualenvs.path", "nothing"))
             yield self.status
             self.assertEqual(
                 self.po.config["settings"]["virtualenvs"]["path"],
@@ -75,58 +71,19 @@ class TestConfig(PoetryDeferredTestCase):
                 self.po.config["settings"]["virtualenvs"]["path"], "nothing"
             )
 
-            self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(
-                self.choose("path")
-            )
             self.pc.run_input_command = lambda x, y, w: self.pc.run_poetry_command(
                 y, "new_bar"
             )
-            self.pc.run()
+            self.pc.run(["settings.virtualenvs.path", "nothing"])
             yield self.status
             self.assertEqual(
                 self.po.config["settings"]["virtualenvs"]["path"], "new_bar"
             )
 
-    def test_toggle_true(self):
-        file = toml.loads(self.config_file.read_text())
-        file = {"settings": {"virtualenvs": {"create": True}}}
-        self.config_file.write_text(toml.dumps(file))
-        self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(
-            self.choose("create")
-        )
-        self.assertEqual(self.po.config["settings"]["virtualenvs"]["create"], True)
-        self.pc.run()
-        yield self.status
-        self.assertEqual(self.po.config["settings"]["virtualenvs"]["create"], False)
-
-    def test_toggle_false(self):
-        file = toml.loads(self.config_file.read_text())
-        file = {"settings": {"virtualenvs": {"create": False}}}
-        self.config_file.write_text(toml.dumps(file))
-
-        self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(
-            self.choose("create")
-        )
-        self.assertEqual(self.po.config["settings"]["virtualenvs"]["create"], False)
-        self.pc.run()
-        yield self.status
-        self.assertEqual(self.po.config["settings"]["virtualenvs"]["create"], True)
-
-    def test_add_repo(self):
-        self.pc.window.show_quick_panel = lambda v, w, x, y: self.pc.dispatch(
-            self.choose("Add a new repo")
-        )
-        self.pc.run_input_command = lambda x, y, w: self.pc.run_poetry_command(
-            y, "repos.newone http://newone"
-        )
-        self.pc.run()
-        yield self.status
-        self.assertEqual(
-            self.po.config["repositories"]["newone"]["url"], "http://newone"
-        )
-
-    def test_configure_credential_call(self):
-        def init():
+    def test_modif_cred(self):
+        with patch.object(
+            poetry.commands.sublime, "yes_no_cancel_dialog", return_value=2
+        ) as yes_no:
             self.config_file.write_text(
                 toml.dumps({"repositories": {"nothing": {"url": "labas"}}})
             )
@@ -136,40 +93,68 @@ class TestConfig(PoetryDeferredTestCase):
                 )
             )
 
-        def run_test(choice):
-            init()
-            self.pc.run_after_command = MagicMock()
-            with patch.object(self.pc.window, "show_quick_panel"):
-                self.pc.run()
-                with patch.object(
-                    self.pc.window,
-                    "show_input_panel",
-                    lambda a, z, e, r, t: self.pc._run_credentials_command(
-                        "name pwd", choice
-                    ),
-                ):
-                    self.pc._callback_credentials(choice)
+            self.assertEqual(
+                self.po.auth["http-basic"]["one"],
+                {"username": "u_one", "password": "u_pwd"},
+            )
 
-        # pypi added if was unset
-        run_test(0)
+            self.pc.run_input_command = lambda x, y, w: self.pc.run_poetry_command(
+                y, "new bar"
+            )
+            #         )
+            self.pc.run(["http-basic.one", "u_one u_password"])
+            yield self.status
+            self.assertEqual(
+                self.po.auth["http-basic"]["one"],
+                {"username": "new", "password": "bar"},
+            )
+
+    def test_unset_cred(self):
+        with patch.object(
+            poetry.commands.sublime, "yes_no_cancel_dialog", return_value=1
+        ) as yes_no:
+            self.config_file.write_text(
+                toml.dumps({"repositories": {"nothing": {"url": "labas"}}})
+            )
+            self.auth_file.write_text(
+                toml.dumps(
+                    {"http-basic": {"one": {"username": "u_one", "password": "u_pwd"}}}
+                )
+            )
+
+            self.assertEqual(
+                self.po.auth["http-basic"]["one"],
+                {"username": "u_one", "password": "u_pwd"},
+            )
+
+            self.pc.run(["http-basic.one", "u_one u_password"])
+            yield self.status
+            self.assertTrue("one" not in self.po.auth["http-basic"])
+
+    def test_toggle_true_false(self):
+        file = toml.loads(self.config_file.read_text())
+        file = {"settings": {"virtualenvs": {"create": True}}}
+        self.config_file.write_text(toml.dumps(file))
+
+        self.assertEqual(self.po.config["settings"]["virtualenvs"]["create"], True)
+
+        # true to False
+        result = False
+        self.pc.run(["settings.virtualenvs.create", True])
         yield self.status
-        self.assertEqual(
-            Poetry(self.window).auth["http-basic"]["pypi"],
-            {"username": "name", "password": "pwd"},
+        self.assertEqual(self.po.config["settings"]["virtualenvs"]["create"], result)
+
+        # false to true
+        self.pc.run(["settings.virtualenvs.create", result])
+        yield self.status
+        self.assertEqual(self.po.config["settings"]["virtualenvs"]["create"], True)
+
+    def test_add_repo(self):
+        self.pc.run_input_command = lambda x, y, w: self.pc.run_poetry_command(
+            y, "repos.newone http://newone"
         )
-
-        # existing repo in auth.toml
-        run_test(1)
+        self.pc.run(("repo", "+"))
         yield self.status
         self.assertEqual(
-            Poetry(self.window).auth["http-basic"]["one"],
-            {"username": "name", "password": "pwd"},
-        )
-
-        # existing repo in config.toml
-        run_test(2)
-        yield self.status
-        self.assertEqual(
-            Poetry(self.window).auth["http-basic"]["nothing"],
-            {"username": "name", "password": "pwd"},
+            self.po.config["repositories"]["newone"]["url"], "http://newone"
         )

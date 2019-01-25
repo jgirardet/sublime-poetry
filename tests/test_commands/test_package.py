@@ -72,9 +72,20 @@ class TestVersionCommands(PoetryDeferredTestCase):
         yield self.status
         self.assertEqual("0.2.0", self.pv.poetry.package_version)
 
-
     def test_d_current_choices(self):
         self.pv.window.show_quick_panel = lambda x, y, z: self.pv._run_version(-0)
         a = self.pv.input("args")
         # yield 1000
-        self.assertEqual(a.list_items(), ['****** current 0.2.0 ******', 'patch', 'minor', 'major', 'prepatch', 'preminor', 'premajor', 'prerelease'])
+        self.assertEqual(
+            a.list_items(),
+            [
+                "****** current 0.2.0 ******",
+                "patch",
+                "minor",
+                "major",
+                "prepatch",
+                "preminor",
+                "premajor",
+                "prerelease",
+            ],
+        )

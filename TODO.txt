@@ -8,15 +8,13 @@ pour la 1.0
 ------------
 Fixer : 
 
-BIEN CHANGER le NOM dans des gg en trop dan config !!!!
 
 
 fix auth
 
 Needed
 ------
-install good python version
-pyproejct : remove, update to latest
+pyproject : remove, update to latest
 
 after
 ------

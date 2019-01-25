@@ -43,7 +43,7 @@ class TestConfig(PoetryDeferredTestCase):
 
     def test_unset_text(self):
         with patch.object(
-            poetry.commands.sublime, "yes_no_cancel_dialog", return_value=1
+            poetry.commands.config.sublime, "yes_no_cancel_dialog", return_value=1
         ) as yes_no:
             file = toml.loads(self.config_file.read_text())
             file = {"settings": {"virtualenvs": {"path": "nothing"}}}
@@ -62,7 +62,7 @@ class TestConfig(PoetryDeferredTestCase):
 
     def test_modif_text(self):
         with patch.object(
-            poetry.commands.sublime, "yes_no_cancel_dialog", return_value=2
+            poetry.commands.config.sublime, "yes_no_cancel_dialog", return_value=2
         ) as yes_no:
             file = toml.loads(self.config_file.read_text())
             file = {"settings": {"virtualenvs": {"path": "nothing"}}}
@@ -82,7 +82,7 @@ class TestConfig(PoetryDeferredTestCase):
 
     def test_modif_cred(self):
         with patch.object(
-            poetry.commands.sublime, "yes_no_cancel_dialog", return_value=2
+            poetry.commands.config.sublime, "yes_no_cancel_dialog", return_value=2
         ) as yes_no:
             self.config_file.write_text(
                 toml.dumps({"repositories": {"nothing": {"url": "labas"}}})
@@ -111,7 +111,7 @@ class TestConfig(PoetryDeferredTestCase):
 
     def test_unset_cred(self):
         with patch.object(
-            poetry.commands.sublime, "yes_no_cancel_dialog", return_value=1
+            poetry.commands.config.sublime, "yes_no_cancel_dialog", return_value=1
         ) as yes_no:
             self.config_file.write_text(
                 toml.dumps({"repositories": {"nothing": {"url": "labas"}}})

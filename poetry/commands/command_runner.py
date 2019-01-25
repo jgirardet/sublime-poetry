@@ -3,8 +3,8 @@ import sublime
 import time
 import logging
 
-from .consts import PACKAGE_NAME, POETRY_STATUS_BAR_TIMEOUT
-from .theme import flash_status_bar
+from ..consts import PACKAGE_NAME, POETRY_STATUS_BAR_TIMEOUT
+from ..theme import flash_status_bar
 
 LOG = logging.getLogger(PACKAGE_NAME)
 

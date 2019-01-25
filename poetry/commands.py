@@ -322,7 +322,7 @@ class PoetryInitCommand(sublime_plugin.WindowCommand):
         ThreadProgress(runner)
 
 
-class PoetryConfiggCommand(PoetryCommand):
+class PoetryConfigCommand(PoetryCommand):
     def input(self, args):
         self.poetry = Poetry(self.window)
         # creation ds choix : mise à plat clé valuer et on pass clé et value
@@ -334,31 +334,36 @@ class PoetryConfiggCommand(PoetryCommand):
         )
 
         fconfig.append(("Add new repository", ("repo", "+")))
-        fconfig.append(("Configure credentials", ("cred", "?")))
 
-        
+        # Auth
+        fconfig.append(titleise("Configure auth"))
+
+        fconfig.extend(self.get_credentials())
+        print(fconfig)
 
         return SimpleListInputHandler(fconfig)
 
     def run(self, choice):
         self.choice = choice
-
+        print(choice)
         if isinstance(self.choice[1], bool):
             self.configure_bool()
 
         elif isinstance(self.choice[1], str):
             if self.choice[1] == "+":
                 self.configure_add_new_repo()
-            elif self.choice[1] == "?":
-                self.configure_credentials()
             else:
                 self.configure_str()
-
+        elif isinstance(self.choice[1], list):
+            self.configure_credientials()
+        else:
+            return
         # relance config quand terminer
-        self.run_after_command(lambda: self.window.run_command("poetry_configg"), 50)
+        self.run_after_command(lambda: self.window.run_command("poetry_config"), 50)
 
     def configure_str(self):
         action = sublime.yes_no_cancel_dialog(self.choice[0], "Unset", "Modify")
+        print(self.choice)
         if action == 0:
             LOG.debug("update of %s cancelled", self.choice[0])
             return
@@ -380,89 +385,72 @@ class PoetryConfiggCommand(PoetryCommand):
     def configure_add_new_repo(self):
         self.run_input_command("New repository : repo.name url", "config", "repo.")
 
-    def configure_credentials(self):
-        sublime.run_command('poetry_configure_credentials')
+    def get_credentials(self):
+        temp_repos = dict(self.poetry.config["repositories"])
+        temp_repos.update(self.poetry.auth["http-basic"])
 
-class PoetryConfigureCredentialsCommand(PoetryCommand):
-    def input(self, args):
-        print(args, "szzzzzzzzz")
-        self.poetry = Poetry(self.window)
-        # print('hhhhhhhhhhhhh')
-        
-        # def do_repo_credentials_list(repos):
-        #     new_repos = [
-        #         [k, " ".join((v.get("username", ""), v.get("password", ""))).strip()]
-        #         for k, v in repos.items()
-        #     ]
-        #     if "pypi" not in repos:
-        #         new_repos.insert(0, ["pypi", ""])
-        #     return [' '.join(*i) for i in new_repos]
-
-        # # configure repo list for credential config
-        # temp_repos = dict(self.poetry.config["repositories"])
-        # temp_repos.update(self.poetry.auth["http-basic"])
-        # repos_auth_list = do_repo_credentials_list(temp_repos)
-
-        # print(temp_repos)
-        # print(repos_auth_list)
-
-        return SimpleListInputHandler(["1"])
-
-    def run(self, choice):
-        return SimpleListInputHandler(["1"])
-        
+        new_repos = [
+            [
+                k,
+                [k, "".join([v.get("username", " "), v.get("password", " ")])],
+            ]  # keep space to result not b false
+            for k, v in temp_repos.items()
+        ]
+        if "pypi" not in temp_repos:
+            new_repos.insert(0, ["pypi", " "])
+        return new_repos
 
 
-class PoetryConfigCommand(PoetryCommand):
-    pass
-    # CB_SLEEP = 50
+# class PoetryConfigCommand(PoetryCommand):
+#     pass
+# CB_SLEEP = 50
 
-    # @staticmethod
-    # def do_repo_credentials_list(repos):
-    #     new_repos = [
-    #         [k, " ".join((v.get("username", ""), v.get("password", ""))).strip()]
-    #         for k, v in repos.items()
-    #     ]
-    #     if "pypi" not in repos:
-    #         new_repos.insert(0, ["pypi", ""])
-    #     return new_repos
+# @staticmethod
+# def do_repo_credentials_list(repos):
+#     new_repos = [
+#         [k, " ".join((v.get("username", ""), v.get("password", ""))).strip()]
+#         for k, v in repos.items()
+#     ]
+#     if "pypi" not in repos:
+#         new_repos.insert(0, ["pypi", ""])
+#     return new_repos
 
-    # def _run_credentials_command(self, x, choice):
-    #     cmd = "config http-basic.{}".format(self.repos_auth_list[choice][0])
-    #     if not x:
-    #         self.run_poetry_command(cmd, "--unset")
+# def _run_credentials_command(self, x, choice):
+#     cmd = "config http-basic.{}".format(self.repos_auth_list[choice][0])
+#     if not x:
+#         self.run_poetry_command(cmd, "--unset")
 
-    #     else:
-    #         self.run_poetry_command(cmd, x)
+#     else:
+#         self.run_poetry_command(cmd, x)
 
-    # def _callback_credentials(self, choice):
+# def _callback_credentials(self, choice):
 
-    #     if choice == -1:
-    #         LOG.debug("configure credentials cancelled")
-    #         return
+#     if choice == -1:
+#         LOG.debug("configure credentials cancelled")
+#         return
 
-    #     print("vant input")
-    #     self.window.show_input_panel(
-    #         "username password (blank to unset)",
-    #         "{}".format(self.repos_auth_list[choice][1]),
-    #         lambda x: self._run_credentials_command(x, choice),
-    #         None,
-    #         None,
-    #     )
+#     print("vant input")
+#     self.window.show_input_panel(
+#         "username password (blank to unset)",
+#         "{}".format(self.repos_auth_list[choice][1]),
+#         lambda x: self._run_credentials_command(x, choice),
+#         None,
+#         None,
+#     )
 
-    #     # elif res == "?":
-    #     #     self.window.show_quick_panel(
-    #     #         self.repos_auth_list,
-    #     #         lambda choice: self._callback_credentials(choice),
-    #     #         sublime.MONOSPACE_FONT,
-    #     #     )
+#     # elif res == "?":
+#     #     self.window.show_quick_panel(
+#     #         self.repos_auth_list,
+#     #         lambda choice: self._callback_credentials(choice),
+#     #         sublime.MONOSPACE_FONT,
+#     #     )
 
-    # def run(self):
+# def run(self):
 
-    #     # configure repo list for credential config
-    #     temp_repos = dict(self.base_config["repositories"])
-    #     temp_repos.update(self.poetry.auth["http-basic"])
-    #     self.repos_auth_list = self.do_repo_credentials_list(temp_repos)
+#     # configure repo list for credential config
+#     temp_repos = dict(self.base_config["repositories"])
+#     temp_repos.update(self.poetry.auth["http-basic"])
+#     self.repos_auth_list = self.do_repo_credentials_list(temp_repos)
 
 
 class PoetrySearchCommand(PoetryCommand):

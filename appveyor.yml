@@ -8,7 +8,7 @@ install:
     - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
     # - pip install black
     - appveyor DownloadFile "https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py"
-    - python get-poetry.py -y
+    - python get-poetry.py --preview -y
     - ps: appveyor DownloadFile "https://raw.githubusercontent.com/SublimeText/UnitTesting/master/sbin/appveyor.ps1"
     - ps: .\appveyor.ps1 "bootstrap" -verbose
     # install Package Control

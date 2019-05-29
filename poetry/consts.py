@@ -10,3 +10,11 @@ CONFIG_OPTIONS = ["poetry_log", "poetry_binary"]
 POETRY_STATUS_BAR_TIMEOUT = 1500
 ACTIVE_VERSION = "poetry_py"  # statusbar id to show current pyversion
 CHOICE_SEPARATOR = "******"
+
+
+CONFIG_TEMPLATE = """[settings]
+[repositories]
+"""
+
+AUTH_TEMPLATE = """[http-basic]
+"""

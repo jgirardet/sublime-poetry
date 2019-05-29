@@ -35,8 +35,12 @@ class PoetryConfigCommand(PoetryCommand):
 
     def run(self, choice):
         self.choice = choice
-        print(choice)
-        if isinstance(self.choice[1], bool):
+        print("|",choice,"|")
+        if choice == " ":
+            self.choice == ("","")
+            self.configure_str()
+
+        elif isinstance(self.choice[1], bool):
             self.configure_bool()
 
         elif isinstance(self.choice[1], str):

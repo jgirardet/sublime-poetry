@@ -7,7 +7,7 @@ import subprocess
 import sublime
 import toml
 
-from .consts import PACKAGE_NAME
+from .consts import PACKAGE_NAME, AUTH_TEMPLATE, CONFIG_TEMPLATE
 from .compat import VENV_BIN_DIR, PYTHON_EXEC
 from .utils import Path, startup_info
 from .utils import get_settings, find_pyproject, find_root_file, import_module_from_path
@@ -139,6 +139,8 @@ class Poetry:
         self.platform = sublime.platform()
         self.shell = True if self.platform == "windows" else None
 
+        self._appdirs=None
+
     @property
     def pyproject(self):
         if self._pyproject:
@@ -232,20 +234,28 @@ class Poetry:
         return base, dev
 
     def appdirs(self):
-        appdirs = import_module_from_path(
-            "appdirs", str(self.poetry_root / "lib" / "poetry" / "utils" / "appdirs.py")
-        )
+        if not self._appdirs:
+            appdirs = import_module_from_path(
+                "appdirs", str(self.poetry_root / "lib" / "poetry" / "utils" / "appdirs.py")
+            )
 
-        dirs = {
-            "cache": Path(appdirs.user_cache_dir("pypoetry")),
-            "config": Path(appdirs.user_config_dir("pypoetry")),
-        }
+            self._appdirs = {
+                "cache": Path(appdirs.user_cache_dir("pypoetry")),
+                "config": Path(appdirs.user_config_dir("pypoetry")),
+            }
 
-        # pypoetry not alwways create config files
-        if not (dirs["config"] / "auth.toml").exists():
-            _ = subprocess.call("{} config".format(self.cmd), shell=self.shell)
+            # pypoetry not alwways create config files
+            # config_py = import_module_from_path(
+            #     "config", str(self.poetry_root / "lib" / "poetry" / "console" / "commands" / "config.py")
+            # )
+            for file in[("auth.toml", AUTH_TEMPLATE), ("config.toml", CONFIG_TEMPLATE)]:
+                cfile = self._appdirs["config"] / file[0]
+                if not cfile.exists():
+                    cfile.write_text(file[1])
 
-        return dirs
+                # _ = subprocess.call("{} config".format(self.cmd), shell=self.shell)
+
+        return self._appdirs
 
     @property
     def auth(self):

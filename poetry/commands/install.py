@@ -30,6 +30,8 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
 
         self.window.set_project_data(project)
         self.quick_status(prefix + "python interpreter set")
+
+
 """
 "LSP":
         {
@@ -52,6 +54,7 @@ class PoetrySetPythonInterpreterCommand(PoetryCommand):
         },
         "python_interpreter": "/home/jimmy/.cache/pypoetry/virtualenvs/hast-ASugzrpy-py3.7/bin/python"
         """
+
 
 class PoetryInstallCommand(PoetryCommand):
     def run(self):

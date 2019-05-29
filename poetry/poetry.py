@@ -139,7 +139,7 @@ class Poetry:
         self.platform = sublime.platform()
         self.shell = True if self.platform == "windows" else None
 
-        self._appdirs=None
+        self._appdirs = None
 
     @property
     def pyproject(self):
@@ -236,7 +236,8 @@ class Poetry:
     def appdirs(self):
         if not self._appdirs:
             appdirs = import_module_from_path(
-                "appdirs", str(self.poetry_root / "lib" / "poetry" / "utils" / "appdirs.py")
+                "appdirs",
+                str(self.poetry_root / "lib" / "poetry" / "utils" / "appdirs.py"),
             )
 
             self._appdirs = {
@@ -248,7 +249,10 @@ class Poetry:
             # config_py = import_module_from_path(
             #     "config", str(self.poetry_root / "lib" / "poetry" / "console" / "commands" / "config.py")
             # )
-            for file in[("auth.toml", AUTH_TEMPLATE), ("config.toml", CONFIG_TEMPLATE)]:
+            for file in [
+                ("auth.toml", AUTH_TEMPLATE),
+                ("config.toml", CONFIG_TEMPLATE),
+            ]:
                 cfile = self._appdirs["config"] / file[0]
                 if not cfile.exists():
                     cfile.write_text(file[1])
@@ -262,16 +266,12 @@ class Poetry:
         # if not self._config:
         config_dir = self.appdirs()["config"]
 
-        auth = toml.loads((config_dir / "auth.toml").read_text())
-
-        return auth
+        return toml.loads((config_dir / "auth.toml").read_text())
 
     @property
     def config(self):
         self.run("config --list")
-        self._config = toml.loads(self.output.decode())
-
-        return self._config
+        return toml.loads(self.output.decode())
 
     @property
     def package_version(self):

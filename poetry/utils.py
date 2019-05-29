@@ -112,7 +112,7 @@ def kill_with_pid(pid: int):
 def find_root_file(view, filename):
     """Only search folders since pyproject.toml/precommit, ... should be nowhere else"""
     window = view.window()
-    variables = window.extract_variables()
+    # variables = window.extract_variables()
     # project path
     # path = Path(variables.get("project_path", "")) / filename
     # if path.exists():
@@ -123,11 +123,11 @@ def find_root_file(view, filename):
     folders = window.folders()
 
     for path in folders:
-        LOG.debug("Folders : %s", path)
+        # LOG.debug("Folders : %s", path)
         path = Path(path) / filename
         if path.exists():
 
-            LOG.debug("%s path %s", filename, path)
+            # LOG.debug("%s path %s", filename, path)
             return path
 
     # nothing found

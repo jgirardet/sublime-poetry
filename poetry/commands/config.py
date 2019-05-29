@@ -21,7 +21,7 @@ class PoetryConfigCommand(PoetryCommand):
         fconfig = [titleise("Global Settings")]
         fconfig.extend([b for b in base if b[0].startswith("settings")])
 
-        fconfig.append(titleise("Reposiories"))
+        fconfig.append(titleise("Repositories"))
         fconfig.extend([b for b in base if b[0].startswith("repositories")])
 
         fconfig.append(("Add new repository", ("repo", "+")))
@@ -35,12 +35,12 @@ class PoetryConfigCommand(PoetryCommand):
 
     def run(self, choice):
         self.choice = choice
-        print("|",choice,"|")
-        if choice == " ":
-            self.choice == ("","")
-            self.configure_str()
+        print("|", choice, "|")
+        # if choice == " ":
+        #     self.choice == ("","")
+        #     self.configure_str()
 
-        elif isinstance(self.choice[1], bool):
+        if isinstance(self.choice[1], bool):
             self.configure_bool()
 
         elif isinstance(self.choice[1], str):
@@ -69,7 +69,9 @@ class PoetryConfigCommand(PoetryCommand):
 
         elif action == 1:
             LOG.debug("unsetting %s", self.choice[0])
-            self.run_poetry_command("config {} --unset".format(self.choice[0]))
+            self.run_poetry_command(
+                "config --unset {} ".format(self.choice[0].rstrip(".url"))
+            )
 
     def configure_bool(self):
         res = not self.choice[1]
@@ -93,5 +95,6 @@ class PoetryConfigCommand(PoetryCommand):
             for k, v in temp_repos.items()
         ]
         if "pypi" not in temp_repos:
-            new_repos.insert(0, ["http-basic.pypi", " "])
+            new_repos.insert(0, ["http-basic.pypi", ["http-basic.pypi", " "]])
+        print(new_repos)
         return new_repos
